@@ -6,6 +6,7 @@ import {
 } from "../sim/game";
 import type { GameState } from "../sim/types";
 import { FitTag, Modal } from "./common";
+import { mood } from "../sim/campaign";
 import { money, store } from "./store";
 
 export function SmallJobsPanel({ state, onClose }: { state: GameState; onClose: () => void }) {
@@ -172,7 +173,7 @@ export function ResultsPanel({ state, onClose }: { state: GameState; onClose: ()
     <Modal title="Past campaigns" onClose={onClose} wide>
       {state.results.length === 0 && <p className="muted">No campaigns yet.</p>}
       <table className="simple">
-        <thead><tr><th>Date</th><th>Campaign</th><th>Setup</th><th>Satisfaction</th><th>Press</th><th /></tr></thead>
+        <thead><tr><th>Date</th><th>Campaign</th><th>Setup</th><th>Satisfaction</th><th>Mood</th><th /></tr></thead>
         <tbody>
           {[...state.results].reverse().map((x) => (
             <tr key={x.id}>
@@ -180,7 +181,7 @@ export function ResultsPanel({ state, onClose }: { state: GameState; onClose: ()
               <td><b>{x.name}</b></td>
               <td className="small">{nameOf(x.approach)} · {nameOf(x.channel)} · {nameOf(x.audience)}</td>
               <td>{x.satisfaction.toFixed(1)}</td>
-              <td>{(x.press.reduce((a, b) => a + b.score, 0) / x.press.length).toFixed(1)}</td>
+              <td>{mood(x.satisfaction)}</td>
               <td><button className="link" onClick={() => setOpen(x.id)}>Details</button></td>
             </tr>
           ))}

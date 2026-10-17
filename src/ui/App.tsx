@@ -34,6 +34,7 @@ function Game({ state }: { state: GameState }) {
           <Office state={state} onMenu={setPanel} />
         </div>
         <aside className="sidebar">
+          <OnAir state={state} />
           <h3>News</h3>
           <div className="notices">
             {[...state.notices].reverse().map((n) => (
@@ -69,7 +70,7 @@ function TopBar({ state, onMenu }: { state: GameState; onMenu: (a: MenuAction) =
       <div className="brand">{state.agencyName}</div>
       <div className="stat"><b>{MONTHS[d.month - 1]} {d.year}</b><span>Week {d.week}</span></div>
       <div className="stat"><b style={{ color: state.cash < 0 ? "#ff9b85" : undefined }}>{money(state.cash)}</b><span>Cash</span></div>
-      <div className="stat"><b>{Math.round(state.creativeRep)} / {Math.round(state.businessRep)}</b><span>Creative / Business rep</span></div>
+      <div className="stat"><b>{Math.round(state.reputation)}</b><span>Reputation</span></div>
       <div className="stat"><b>{state.knowledge}</b><span>Knowledge</span></div>
       <button onClick={() => store.togglePause()}>{store.paused ? "▶ Resume" : "❚❚ Pause"}</button>
       <button className="secondary" onClick={() => onMenu("handbook")}>Handbook</button>
@@ -162,5 +163,29 @@ function GameOver({ state }: { state: GameState }) {
         <button className="primary" onClick={() => store.quit()}>New game</button>
       </div>
     </Modal>
+  );
+}
+
+function OnAir({ state }: { state: GameState }) {
+  if (state.lifts.length === 0) return null;
+  return (
+    <section className="onair">
+      <h3>On Air</h3>
+      {state.lifts.map((l) => {
+        const max = Math.max(...l.weeks, 1);
+        const earned = l.paid + l.pending;
+        return (
+          <div key={l.resultId} className="onair-item">
+            <div className="spread small"><b>{l.name}</b><span>{l.week}/{l.weeks.length} wk</span></div>
+            <svg viewBox={`0 0 ${l.weeks.length * 6} 30`} className="spark" preserveAspectRatio="none" aria-label="Weekly sales lift">
+              {l.weeks.map((v, i) => (
+                <rect key={i} x={i * 6} y={30 - (v / max) * 28} width="5" height={(v / max) * 28} fill={i < l.week ? "var(--orange)" : "var(--wood-light)"} opacity={i < l.week ? 1 : 0.25} />
+              ))}
+            </svg>
+            <div className="small muted">Bonus so far {money(earned)} ({Math.round(l.bonusPct * 100)}% of lift)</div>
+          </div>
+        );
+      })}
+    </section>
   );
 }

@@ -93,6 +93,7 @@ export interface ExecScore {
   role: "CEO" | "Marketing Director" | "Finance Director";
   score: number; // 1-10
   line: string;
+  factors: { label: string; value: number }[];
 }
 
 export interface CampaignResult {
@@ -110,7 +111,6 @@ export interface CampaignResult {
   wasRecord: boolean;
   execs: ExecScore[];
   satisfaction: number; // 1-10
-  press: { magazine: string; score: number }[];
   liftWeeks: number[]; // expected sales lift per week, $
   bonusPct: number;
   fee: number;
@@ -122,10 +122,12 @@ export interface CampaignResult {
 
 export interface ActiveLift {
   resultId: number;
+  name: string;
   clientName: string;
   weeks: number[];
-  week: number;
+  week: number; // weeks already on air
   bonusPct: number;
+  pending: number; // bonus earned this month, paid at month end
   paid: number;
 }
 
@@ -146,15 +148,14 @@ export interface Unlocks {
 }
 
 export interface GameState {
-  version: 1;
+  version: 2;
   seed: number;
   rng: number;
   day: number;
   agencyName: string;
   playerName: string;
   cash: number;
-  creativeRep: number;
-  businessRep: number;
+  reputation: number;
   knowledge: number;
   office: number; // 0 = single room, 1 = small office
   staff: Staff[];

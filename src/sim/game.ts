@@ -30,15 +30,14 @@ export interface NewGameOptions {
 export function newGame(opts: NewGameOptions = {}): GameState {
   const seed = opts.seed ?? Math.floor(Math.random() * 2 ** 31);
   const state: GameState = {
-    version: 1,
+    version: 2,
     seed,
     rng: seed,
     day: 0,
     agencyName: opts.agencyName ?? "Mad Avenue Advertising Co.",
     playerName: opts.playerName ?? "Don",
     cash: 8000,
-    creativeRep: 0,
-    businessRep: 0,
+    reputation: 0,
     knowledge: 0,
     office: 0,
     staff: [{ id: 1, name: opts.playerName ?? "Don", isPlayer: true, creativity: 30, strategy: 26, speed: 1, salary: 0, xp: 0 }],
@@ -114,8 +113,8 @@ function progressProject(s: GameState, rng: Rng, events: TickEvents): void {
   if (!p) return;
   if (p.kind === "smallJob") {
     for (const st of s.staff) {
-      const c = (st.creativity / 5) * st.speed * rng.range(0.8, 1.2) * 0.5;
-      const sp = (st.strategy / 5) * st.speed * rng.range(0.8, 1.2) * 0.5;
+      const c = (st.creativity / 10) * st.speed * rng.range(0.8, 1.2) * 0.5;
+      const sp = (st.strategy / 10) * st.speed * rng.range(0.8, 1.2) * 0.5;
       p.c += c;
       p.s += sp;
       events.work.push({ staffId: st.id, area: "production", c, s: sp, note: false });
@@ -124,14 +123,14 @@ function progressProject(s: GameState, rng: Rng, events: TickEvents): void {
       s.cash += p.job.pay;
       s.yearProfit += p.job.pay;
       s.knowledge += 1;
-      s.businessRep += 0.5;
+      s.reputation += 0.5;
       notify(s, `${p.job.client} paid $${p.job.pay.toLocaleString("en-US")} for the ${p.job.title.toLowerCase()}.`, "good");
       gainXp(s, 4);
       s.project = null;
     } else if (s.day > p.deadlineDay) {
       s.cash -= p.job.penalty;
       s.yearProfit -= p.job.penalty;
-      s.businessRep = Math.max(0, s.businessRep - 1);
+      s.reputation = Math.max(0, s.reputation - 1);
       notify(s, `We missed the deadline for ${p.job.client}. Penalty: $${p.job.penalty.toLocaleString("en-US")}.`, "bad");
       s.project = null;
     }
@@ -154,7 +153,7 @@ function progressProject(s: GameState, rng: Rng, events: TickEvents): void {
       }
     }
   } else if (p.phase === "revising") {
-    const rate = s.staff.length * 0.9 + 0.3;
+    const rate = s.staff.length * 0.45 + 0.15;
     p.notes = Math.max(0, p.notes - rate * rng.range(0.7, 1.3));
     for (const st of s.staff) events.work.push({ staffId: st.id, area: "production", c: 0, s: 0, note: false });
     if (p.notes <= 0.01) {
@@ -165,17 +164,12 @@ function progressProject(s: GameState, rng: Rng, events: TickEvents): void {
 }
 
 function weekly(s: GameState, rng: Rng): void {
-  // Sales Lift bonuses arrive weekly.
+  // Campaigns on air keep lifting client sales; our share accrues weekly and is paid monthly.
   for (const lift of s.lifts) {
-    const amount = Math.round(lift.weeks[lift.week] * lift.bonusPct);
-    s.cash += amount;
-    s.yearProfit += amount;
-    lift.paid += amount;
+    if (lift.week >= lift.weeks.length) continue;
+    lift.pending += lift.weeks[lift.week] * lift.bonusPct;
     lift.week += 1;
   }
-  const done = s.lifts.filter((l) => l.week >= l.weeks.length);
-  for (const l of done) notify(s, `The ${l.clientName} campaign has run its course. Bonus earned: $${l.paid.toLocaleString("en-US")}.`, "info");
-  s.lifts = s.lifts.filter((l) => l.week < l.weeks.length);
 
   s.briefs = s.briefs.filter((b) => b.expiresDay > s.day);
   s.smallJobs = s.smallJobs.filter((j) => j.expiresDay > s.day);
@@ -184,6 +178,15 @@ function weekly(s: GameState, rng: Rng): void {
 }
 
 function monthly(s: GameState): void {
+  const bonus = Math.round(s.lifts.reduce((sum, l) => sum + l.pending, 0));
+  s.cash += bonus;
+  s.yearProfit += bonus;
+  for (const l of s.lifts) {
+    l.paid += Math.round(l.pending);
+    l.pending = 0;
+    if (l.week >= l.weeks.length) notify(s, `${l.name} has come off the air. Total Sales Lift bonus: $${l.paid.toLocaleString("en-US")}.`, "info");
+  }
+  s.lifts = s.lifts.filter((l) => l.week < l.weeks.length);
   const salaries = s.staff.reduce((sum, st) => sum + st.salary, 0);
   const rent = Math.round(OFFICES[s.office].rent * inflation(s.day));
   const cost = salaries + rent;
@@ -218,14 +221,14 @@ export function refreshOffers(s: GameState, rng: Rng): void {
 
 function makeBrief(s: GameState, rng: Rng): Brief {
   const scales = s.unlocks.scales;
-  const scaleId = scales.length > 1 && rng.chance(0.4 + Math.min(0.3, s.businessRep / 60)) ? scales[scales.length - 1] : "local";
+  const scaleId = scales.length > 1 && rng.chance(0.4 + Math.min(0.3, s.reputation / 60)) ? scales[scales.length - 1] : "local";
   const pool = CLIENTS.filter((c) => (scaleId === "local" ? c.budget === 1 : c.budget >= 2));
   const client = { ...rng.pick(pool) };
   const objectives: Objective[] = ["awareness", "consideration", "steal"];
   const objective = rng.pick(objectives);
   const audienceId = rng.pick(AUDIENCES.map((a) => a.id));
   const sc = scale(scaleId);
-  const repBoost = 1 + Math.min(0.5, (s.businessRep + s.creativeRep) / 100);
+  const repBoost = 1 + Math.min(0.5, s.reputation / 60);
   const fee = Math.round((sc.fee * inflation(s.day) * repBoost * rng.range(0.85, 1.2)) / 50) * 50;
   const hint = [rng.pick(HINTS.objective[objective]), rng.pick(HINTS.audience[audienceId])];
   if (client.risk <= 0.25) hint.push(HINTS.risk.low);
@@ -237,7 +240,7 @@ function makeBrief(s: GameState, rng: Rng): Brief {
     audience: audienceId,
     scale: scaleId,
     fee,
-    bonusPct: Math.round(rng.range(0.03, 0.06) * 100) / 100,
+    bonusPct: Math.round(rng.range(0.06, 0.1) * 100) / 100,
     deadlineWeeks: Math.round((sc.stageDays * 3) / DAYS_PER_WEEK) + rng.int(2, 3),
     hint,
     expiresDay: s.day + rng.int(4, 8) * DAYS_PER_WEEK,
@@ -247,7 +250,7 @@ function makeBrief(s: GameState, rng: Rng): Brief {
 function makeSmallJob(s: GameState, rng: Rng): SmallJob {
   const def = rng.pick(SMALL_JOBS);
   const size = rng.range(0.7, 1.5) * (1 + 0.15 * (s.day / DAYS_PER_YEAR));
-  const weeks = rng.int(2, 3);
+  const weeks = rng.int(3, 5);
   const pay = Math.round((550 * size * inflation(s.day)) / 25) * 25;
   return {
     id: nextId(s),
@@ -392,10 +395,8 @@ export function deliver(s: GameState): void {
   s.cash += result.fee;
   s.yearProfit += result.fee;
   s.knowledge += result.knowledge;
-  const pressAvg = result.press.reduce((a, b) => a + b.score, 0) / result.press.length;
-  s.creativeRep = Math.max(0, s.creativeRep + (pressAvg - 5) * 0.8);
-  s.businessRep = Math.max(0, s.businessRep + (result.satisfaction - 5) * 0.8);
-  s.lifts.push({ resultId: result.id, clientName: result.clientName, weeks: result.liftWeeks, week: 0, bonusPct: result.bonusPct, paid: 0 });
+  s.reputation = Math.max(0, s.reputation + (result.satisfaction - 5) * 1.2);
+  s.lifts.push({ resultId: result.id, name: result.name, clientName: result.clientName, weeks: result.liftWeeks, week: 0, bonusPct: result.bonusPct, pending: 0, paid: 0 });
   gainXp(s, 10);
   s.project = null;
   s.pendingResult = result.id;

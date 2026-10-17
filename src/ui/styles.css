@@ -235,3 +235,17 @@ table.simple th { font-size: 12px; text-transform: uppercase; color: var(--ink-s
 .title-card .sub { font-family: var(--display); color: var(--wood); font-size: 18px; margin-bottom: 18px; }
 .title-card label { display: flex; flex-direction: column; gap: 4px; font-weight: 700; font-size: 13px; }
 .error { color: var(--bad); font-weight: 700; font-size: 13px; }
+
+.factors { display: flex; flex-direction: column; gap: 3px; margin-top: 6px; }
+.factor { display: grid; grid-template-columns: 170px 1fr; gap: 8px; align-items: center; font-size: 12px; color: var(--ink-soft); }
+.factor .bar { height: 7px; background: var(--cream); border-radius: 4px; overflow: hidden; }
+.factor .bar span { display: block; height: 100%; border-radius: 4px; }
+.factor .bar .hi { background: var(--great); }
+.factor .bar .mid { background: var(--ok); }
+.factor .bar .lo { background: var(--bad); }
+.mood { font-family: var(--display); font-size: 18px; color: var(--wood); }
+.onair { padding: 0 14px 6px; border-bottom: 2px dashed var(--wood-light); margin-bottom: 4px; display: flex; flex-direction: column; gap: 8px; }
+.onair h3 { padding: 12px 0 0; margin: 0; }
+.onair-item { background: var(--paper); padding: 7px 9px; border-radius: 4px; }
+.spark { width: 100%; height: 30px; display: block; margin: 4px 0; }
+.onair { max-height: 45%; overflow-y: auto; flex-shrink: 0; }

@@ -84,7 +84,6 @@ export const SLOGANS = clients.slogans as Record<string, Slogan[]>;
 export const SMALL_JOBS = clients.smallJobs as { title: string; client: string }[];
 export const FIRST_NAMES = clients.firstNames;
 export const LAST_NAMES = clients.lastNames;
-export const MAGAZINES = clients.magazines;
 
 function byId<T extends { id: string }>(list: T[], id: string): T {
   const found = list.find((x) => x.id === id);

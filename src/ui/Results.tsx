@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { nameOf } from "../sim/content";
 import { dismissResult } from "../sim/game";
+import { mood } from "../sim/campaign";
 import type { CampaignResult } from "../sim/types";
 import { FitTag, Modal } from "./common";
 import { money, store } from "./store";
 
-const STEPS = ["The verdict", "Sales Lift", "Review meeting", "The finished ad"];
+const STEPS = ["The verdict", "Review meeting", "The finished ad"];
 
 export function ResultModal({ result }: { result: CampaignResult }) {
   const [step, setStep] = useState(0);
@@ -14,9 +15,8 @@ export function ResultModal({ result }: { result: CampaignResult }) {
   return (
     <Modal title={`${result.name}: ${STEPS[step]}`} wide>
       {step === 0 && <Verdict r={result} />}
-      {step === 1 && <SalesLift r={result} />}
-      {step === 2 && <Review r={result} />}
-      {step === 3 && <FinishedAd r={result} />}
+      {step === 1 && <Review r={result} />}
+      {step === 2 && <FinishedAd r={result} />}
       <div className="spread" style={{ marginTop: 18 }}>
         <span className="small muted">{step + 1} / {STEPS.length}</span>
         <div className="row">
@@ -45,6 +45,16 @@ function Verdict({ r }: { r: CampaignResult }) {
             <div>
               <div className="role">{e.role}</div>
               <div className="line">{i < shown ? `"${e.line}"` : "…"}</div>
+              {i < shown && (
+                <div className="factors">
+                  {e.factors.map((f) => (
+                    <div key={f.label} className="factor">
+                      <span>{f.label}</span>
+                      <span className="bar"><span className={f.value >= 0.75 ? "hi" : f.value >= 0.5 ? "mid" : "lo"} style={{ width: `${Math.max(4, f.value * 100)}%` }} /></span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         ))}
@@ -53,55 +63,14 @@ function Verdict({ r }: { r: CampaignResult }) {
         <div className="card">
           <div className="small muted">Client satisfaction</div>
           <div className="big-number">{shown >= r.execs.length ? `${r.satisfaction.toFixed(1)} / 10` : "…"}</div>
-        </div>
-        <div className="card">
-          <div className="small muted">Trade press</div>
-          {r.press.map((p) => (
-            <div key={p.magazine} className="spread"><i>{p.magazine}</i><b>{shown >= r.execs.length ? `${p.score}/10` : "…"}</b></div>
-          ))}
+          {shown >= r.execs.length && <div className="mood">{mood(r.satisfaction)}</div>}
         </div>
         <div className="card small">
           Fee received: <b>{money(r.fee)}</b><br />
-          Spent on production and extras: <b>{money(r.cost)}</b>
+          Spent on production and extras: <b>{money(r.cost)}</b><br />
+          Now on air for {r.liftWeeks.length} weeks. Our {Math.round(r.bonusPct * 100)}% of the Sales Lift is paid monthly; follow it under On Air.
           {r.wasRecord && <div style={{ marginTop: 6, color: "var(--great)", fontWeight: 800 }}>New agency record!</div>}
         </div>
-      </div>
-    </div>
-  );
-}
-
-function SalesLift({ r }: { r: CampaignResult }) {
-  const [weeks, setWeeks] = useState(0);
-  useEffect(() => {
-    if (weeks >= r.liftWeeks.length) return;
-    const t = setTimeout(() => setWeeks(weeks + 1), 140);
-    return () => clearTimeout(t);
-  }, [weeks, r.liftWeeks.length]);
-  const max = Math.max(...r.liftWeeks, 1);
-  const total = r.liftWeeks.reduce((a, b) => a + b, 0);
-  const W = 600;
-  const H = 180;
-  const bw = W / r.liftWeeks.length;
-  return (
-    <div className="stack">
-      <p className="muted">
-        Sales Lift is the extra sales {r.clientName} makes because of the campaign. The agency earns {Math.round(r.bonusPct * 100)}% of it as a bonus, paid week by week.
-      </p>
-      <svg className="chart" viewBox={`0 0 ${W} ${H + 24}`} role="img" aria-label="Weekly sales lift">
-        <line x1="0" y1={H} x2={W} y2={H} stroke="var(--wood)" strokeWidth="2" />
-        {r.liftWeeks.map((v, i) => {
-          const h = i < weeks ? (v / max) * (H - 10) : 0;
-          return (
-            <g key={i}>
-              <rect x={i * bw + 6} y={H - h} width={bw - 12} height={h} fill="var(--orange)" rx="3" style={{ transition: "all 0.25s" }} />
-              <text x={i * bw + bw / 2} y={H + 18} textAnchor="middle" fontSize="12" fill="var(--ink-soft)">W{i + 1}</text>
-            </g>
-          );
-        })}
-      </svg>
-      <div className="grid2">
-        <div className="card"><div className="small muted">Expected Sales Lift</div><div className="big-number">{money(total)}</div></div>
-        <div className="card"><div className="small muted">Our bonus ({Math.round(r.bonusPct * 100)}%)</div><div className="big-number">{money(total * r.bonusPct)}</div></div>
       </div>
     </div>
   );

@@ -15,6 +15,22 @@
     {
       "id": "automobile",
       "name": "Automobiles"
+    },
+    {
+      "id": "fastFood",
+      "name": "Fast Food"
+    },
+    {
+      "id": "cosmetics",
+      "name": "Cosmetics"
+    },
+    {
+      "id": "toys",
+      "name": "Toys"
+    },
+    {
+      "id": "banking",
+      "name": "Banking"
     }
   ],
   "approaches": [
@@ -91,7 +107,7 @@
       "id": "testimonial",
       "name": "Testimonial",
       "boldness": 0.1,
-      "startUnlocked": false,
+      "startUnlocked": true,
       "weights": [
         [
           3,
@@ -130,6 +146,52 @@
           1,
           2,
           3
+        ]
+      ]
+    },
+    {
+      "id": "lifestyle",
+      "name": "Lifestyle",
+      "boldness": 0.5,
+      "startUnlocked": false,
+      "weights": [
+        [
+          2,
+          2,
+          2
+        ],
+        [
+          2,
+          3,
+          2
+        ],
+        [
+          3,
+          3,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "shock",
+      "name": "Shock",
+      "boldness": 1.0,
+      "startUnlocked": false,
+      "weights": [
+        [
+          1,
+          1,
+          3
+        ],
+        [
+          3,
+          3,
+          1
+        ],
+        [
+          2,
+          3,
+          1
         ]
       ]
     }
@@ -172,6 +234,42 @@
       "cost": 300
     },
     {
+      "id": "outdoor",
+      "name": "Outdoor",
+      "startUnlocked": true,
+      "minScale": "local",
+      "useful": {
+        "research": 1,
+        "positioning": 1,
+        "bigIdea": 1,
+        "copy": 0.6,
+        "art": 1,
+        "music": 0,
+        "casting": 0.3,
+        "production": 1,
+        "media": 1
+      },
+      "cost": 250
+    },
+    {
+      "id": "directMail",
+      "name": "Direct Mail",
+      "startUnlocked": false,
+      "minScale": "local",
+      "useful": {
+        "research": 1,
+        "positioning": 1,
+        "bigIdea": 1,
+        "copy": 1,
+        "art": 0.6,
+        "music": 0,
+        "casting": 0,
+        "production": 0.6,
+        "media": 1
+      },
+      "cost": 150
+    },
+    {
       "id": "tv",
       "name": "Network TV",
       "startUnlocked": false,
@@ -204,6 +302,11 @@
     {
       "id": "adults",
       "name": "Adults",
+      "startUnlocked": true
+    },
+    {
+      "id": "women",
+      "name": "Women",
       "startUnlocked": false
     }
   ],
@@ -211,19 +314,19 @@
     {
       "id": "local",
       "name": "Local",
-      "stageDays": 7,
+      "stageDays": 14,
       "target": 120,
-      "fee": 900,
-      "market": 15000,
+      "fee": 1600,
+      "market": 30000,
       "costMult": 1
     },
     {
       "id": "regional",
       "name": "Regional",
-      "stageDays": 14,
-      "target": 900,
-      "fee": 5000,
-      "market": 120000,
+      "stageDays": 21,
+      "target": 700,
+      "fee": 8000,
+      "market": 220000,
       "costMult": 3
     }
   ],
@@ -234,54 +337,122 @@
         "emotional": "great",
         "jingle": "great",
         "testimonial": "ok",
-        "comparative": "ok"
+        "comparative": "ok",
+        "lifestyle": "great",
+        "shock": "bad"
       },
       "beer": {
         "humor": "great",
         "emotional": "ok",
         "jingle": "good",
         "testimonial": "good",
-        "comparative": "bad"
+        "comparative": "bad",
+        "lifestyle": "good",
+        "shock": "ok"
       },
       "detergent": {
         "humor": "ok",
         "emotional": "good",
         "jingle": "good",
         "testimonial": "great",
-        "comparative": "great"
+        "comparative": "great",
+        "lifestyle": "bad",
+        "shock": "bad"
       },
       "automobile": {
         "humor": "ok",
         "emotional": "great",
         "jingle": "bad",
         "testimonial": "good",
-        "comparative": "good"
+        "comparative": "good",
+        "lifestyle": "great",
+        "shock": "ok"
+      },
+      "fastFood": {
+        "humor": "great",
+        "emotional": "ok",
+        "jingle": "great",
+        "testimonial": "ok",
+        "comparative": "good",
+        "lifestyle": "ok",
+        "shock": "bad"
+      },
+      "cosmetics": {
+        "humor": "bad",
+        "emotional": "great",
+        "jingle": "ok",
+        "testimonial": "good",
+        "comparative": "ok",
+        "lifestyle": "great",
+        "shock": "good"
+      },
+      "toys": {
+        "humor": "great",
+        "emotional": "good",
+        "jingle": "great",
+        "testimonial": "bad",
+        "comparative": "bad",
+        "lifestyle": "ok",
+        "shock": "bad"
+      },
+      "banking": {
+        "humor": "ok",
+        "emotional": "good",
+        "jingle": "ok",
+        "testimonial": "great",
+        "comparative": "good",
+        "lifestyle": "ok",
+        "shock": "bad"
       }
     },
     "approachChannel": {
       "humor": {
         "print": "ok",
         "radio": "great",
+        "outdoor": "good",
+        "directMail": "bad",
         "tv": "great"
       },
       "emotional": {
         "print": "good",
         "radio": "ok",
+        "outdoor": "ok",
+        "directMail": "good",
         "tv": "great"
       },
       "jingle": {
         "print": "bad",
         "radio": "great",
+        "outdoor": "bad",
+        "directMail": "bad",
         "tv": "good"
       },
       "testimonial": {
         "print": "great",
         "radio": "good",
+        "outdoor": "ok",
+        "directMail": "great",
         "tv": "good"
       },
       "comparative": {
         "print": "great",
         "radio": "ok",
+        "outdoor": "good",
+        "directMail": "great",
+        "tv": "good"
+      },
+      "lifestyle": {
+        "print": "great",
+        "radio": "ok",
+        "outdoor": "great",
+        "directMail": "ok",
+        "tv": "good"
+      },
+      "shock": {
+        "print": "good",
+        "radio": "ok",
+        "outdoor": "great",
+        "directMail": "bad",
         "tv": "good"
       }
     },
@@ -289,39 +460,82 @@
       "softDrinks": {
         "youth": "great",
         "families": "good",
-        "adults": "ok"
+        "adults": "ok",
+        "women": "ok"
       },
       "beer": {
         "youth": "good",
         "families": "bad",
-        "adults": "great"
+        "adults": "great",
+        "women": "bad"
       },
       "detergent": {
         "youth": "bad",
         "families": "great",
-        "adults": "good"
+        "adults": "good",
+        "women": "great"
       },
       "automobile": {
         "youth": "ok",
         "families": "good",
-        "adults": "great"
+        "adults": "great",
+        "women": "ok"
+      },
+      "fastFood": {
+        "youth": "great",
+        "families": "great",
+        "adults": "ok",
+        "women": "ok"
+      },
+      "cosmetics": {
+        "youth": "good",
+        "families": "bad",
+        "adults": "ok",
+        "women": "great"
+      },
+      "toys": {
+        "youth": "great",
+        "families": "great",
+        "adults": "bad",
+        "women": "ok"
+      },
+      "banking": {
+        "youth": "bad",
+        "families": "good",
+        "adults": "great",
+        "women": "good"
       }
     },
     "channelAudience": {
       "print": {
         "youth": "ok",
         "families": "good",
-        "adults": "great"
+        "adults": "great",
+        "women": "great"
       },
       "radio": {
         "youth": "great",
         "families": "ok",
-        "adults": "good"
+        "adults": "good",
+        "women": "good"
+      },
+      "outdoor": {
+        "youth": "good",
+        "families": "good",
+        "adults": "good",
+        "women": "ok"
+      },
+      "directMail": {
+        "youth": "bad",
+        "families": "great",
+        "adults": "good",
+        "women": "good"
       },
       "tv": {
         "youth": "good",
         "families": "great",
-        "adults": "good"
+        "adults": "good",
+        "women": "great"
       }
     }
   },
@@ -350,7 +564,9 @@
       "area": "art",
       "boost": 0.45,
       "channels": [
-        "print"
+        "print",
+        "outdoor",
+        "directMail"
       ],
       "startUnlocked": false
     },
@@ -385,33 +601,43 @@
   ],
   "research": [
     {
-      "id": "r_testimonial",
-      "name": "Testimonial approach",
-      "desc": "Real people vouching for the product.",
-      "kp": 8,
-      "cost": 500,
-      "unlock": {
-        "approach": "testimonial"
-      }
-    },
-    {
       "id": "r_comparative",
       "name": "Comparative approach",
       "desc": "Name the rival. Win the argument.",
-      "kp": 10,
-      "cost": 800,
+      "kp": 6,
+      "cost": 600,
       "unlock": {
         "approach": "comparative"
       }
     },
     {
-      "id": "r_adults",
-      "name": "Adults audience",
-      "desc": "Grown-ups with grown-up wallets.",
+      "id": "r_lifestyle",
+      "name": "Lifestyle approach",
+      "desc": "Sell the life, not the product.",
+      "kp": 8,
+      "cost": 800,
+      "unlock": {
+        "approach": "lifestyle"
+      }
+    },
+    {
+      "id": "r_women",
+      "name": "Women audience",
+      "desc": "Talk to the person who really makes the buying decisions.",
       "kp": 6,
+      "cost": 500,
+      "unlock": {
+        "audience": "women"
+      }
+    },
+    {
+      "id": "r_directMail",
+      "name": "Direct mail",
+      "desc": "Letters, coupons and catalogs straight to the mailbox.",
+      "kp": 5,
       "cost": 400,
       "unlock": {
-        "audience": "adults"
+        "channel": "directMail"
       }
     },
     {
@@ -427,7 +653,7 @@
     {
       "id": "r_colorPhoto",
       "name": "Color photography",
-      "desc": "Unlocks Color Photography for print.",
+      "desc": "Unlocks Color Photography for print, outdoor and mail.",
       "kp": 6,
       "cost": 500,
       "unlock": {
@@ -442,6 +668,16 @@
       "cost": 500,
       "unlock": {
         "extra": "originalJingle"
+      }
+    },
+    {
+      "id": "r_shock",
+      "name": "Shock approach",
+      "desc": "Make them gasp. Some clients will love it.",
+      "kp": 12,
+      "cost": 1500,
+      "unlock": {
+        "approach": "shock"
       }
     },
     {
