@@ -28,25 +28,30 @@ function Game({ state }: { state: GameState }) {
 
   return (
     <div className="game">
-      <TopBar state={state} onMenu={setPanel} />
-      <div className="main">
-        <div className="office-wrap">
-          <Office state={state} onMenu={setPanel} />
-        </div>
-        <aside className="sidebar">
+      <div className="stage">
+        <Office state={state} onMenu={setPanel} />
+        <div className="hud hud-left">
+          <TopBar state={state} onMenu={setPanel} />
           <OnAir state={state} />
-          <h3>News</h3>
-          <div className="notices">
-            {[...state.notices].reverse().map((n) => (
-              <div key={n.id} className={`notice ${n.tone}`}>
+        </div>
+        <div className="hud hud-right">
+          <div className="row">
+            <button className="round" onClick={() => store.togglePause()} aria-label={store.paused ? "Resume" : "Pause"}>{store.paused ? "▶" : "❚❚"}</button>
+            <button className="round" onClick={() => setPanel("handbook")} aria-label="Agency Handbook">?</button>
+          </div>
+          <div className="toasts">
+            {[...state.notices].reverse().slice(0, 4).map((n, i) => (
+              <div key={n.id} className={`toast ${n.tone}`} style={{ opacity: 1 - i * 0.2 }}>
                 <span className="when">{formatDate(n.day)}</span>
                 {n.text}
               </div>
             ))}
           </div>
-        </aside>
+        </div>
+        <div className="hud hud-bottom">
+          <BottomBar state={state} onMenu={setPanel} />
+        </div>
       </div>
-      <BottomBar state={state} onMenu={setPanel} />
 
       {panel === "briefs" && <BriefsPanel state={state} onClose={close} />}
       {panel === "smallJobs" && <SmallJobsPanel state={state} onClose={close} />}
@@ -63,18 +68,18 @@ function Game({ state }: { state: GameState }) {
   );
 }
 
-function TopBar({ state, onMenu }: { state: GameState; onMenu: (a: MenuAction) => void }) {
+function TopBar({ state }: { state: GameState; onMenu: (a: MenuAction) => void }) {
   const d = dateOf(state.day);
   return (
-    <header className="topbar">
-      <div className="brand">{state.agencyName}</div>
-      <div className="stat"><b>{MONTHS[d.month - 1]} {d.year}</b><span>Week {d.week}</span></div>
-      <div className="stat"><b style={{ color: state.cash < 0 ? "#ff9b85" : undefined }}>{money(state.cash)}</b><span>Cash</span></div>
-      <div className="stat"><b>{Math.round(state.reputation)}</b><span>Reputation</span></div>
-      <div className="stat"><b>{state.knowledge}</b><span>Knowledge</span></div>
-      <button onClick={() => store.togglePause()}>{store.paused ? "▶ Resume" : "❚❚ Pause"}</button>
-      <button className="secondary" onClick={() => onMenu("handbook")}>Handbook</button>
-    </header>
+    <div className="statcard">
+      <div className="agency">{state.agencyName}</div>
+      <div className="cash" style={{ color: state.cash < 0 ? "var(--bad)" : undefined }}>{money(state.cash)}</div>
+      <div className="statline">
+        <span title="Reputation">★ {Math.round(state.reputation)}</span>
+        <span title="Knowledge points">✎ {state.knowledge}</span>
+      </div>
+      <div className="date">{MONTHS[d.month - 1]} {d.year} · Week {d.week}</div>
+    </div>
   );
 }
 

@@ -137,3 +137,6 @@ export function useGame(): GameState | null {
 
 export const money = (n: number) =>
   `${n < 0 ? "-" : ""}$${Math.abs(Math.round(n)).toLocaleString("en-US")}`;
+
+// Handy for playtesting from the browser console.
+(globalThis as unknown as { madAvenue: GameStore }).madAvenue = store;
