@@ -1,0 +1,75 @@
+{
+  "clients": [
+    { "name": "Sunny Day Soda Co.", "category": "softDrinks", "budget": 1, "pickiness": 1, "risk": 0.6 },
+    { "name": "Fizzwell Bottling", "category": "softDrinks", "budget": 2, "pickiness": 2, "risk": 0.4 },
+    { "name": "Dr. Bubbles", "category": "softDrinks", "budget": 2, "pickiness": 3, "risk": 0.8 },
+    { "name": "Old Barrel Brewery", "category": "beer", "budget": 1, "pickiness": 2, "risk": 0.3 },
+    { "name": "Hopfield Lager", "category": "beer", "budget": 2, "pickiness": 2, "risk": 0.7 },
+    { "name": "Brewster & Sons", "category": "beer", "budget": 2, "pickiness": 3, "risk": 0.2 },
+    { "name": "Sparkle Suds", "category": "detergent", "budget": 1, "pickiness": 1, "risk": 0.3 },
+    { "name": "Mrs. Tidwell's Soap", "category": "detergent", "budget": 1, "pickiness": 2, "risk": 0.1 },
+    { "name": "Brite-O Laundry", "category": "detergent", "budget": 2, "pickiness": 2, "risk": 0.5 },
+    { "name": "Big Al's Motors", "category": "automobile", "budget": 1, "pickiness": 1, "risk": 0.7 },
+    { "name": "Honest Ed's Used Cars", "category": "automobile", "budget": 1, "pickiness": 2, "risk": 0.9 },
+    { "name": "Crestline Motor Co.", "category": "automobile", "budget": 2, "pickiness": 3, "risk": 0.3 }
+  ],
+  "hints": {
+    "audience": {
+      "youth": ["We want the kids talking about us on the school bus.", "Our buyers are young, loud and restless.", "Teenagers. You know, the ones with the transistor radios."],
+      "families": ["Think of the whole family at the dinner table.", "Moms do the shopping and we want Moms on our side.", "Something the kids and grandma can both enjoy."],
+      "adults": ["Our customers have mortgages and good taste.", "We sell to grown-ups who work hard for their money.", "The country club crowd, if you follow me."]
+    },
+    "objective": {
+      "awareness": ["Nobody in town knows our name yet.", "We need people to remember us. That's all.", "Make us the first thing they think of."],
+      "consideration": ["People know us, but they don't know why we're better.", "Tell them what makes us worth the extra nickel.", "Give them a reason to pick us off the shelf."],
+      "steal": ["The fella across the street is eating our lunch.", "We want his customers. All of them.", "Our rival has had it too easy for too long."]
+    },
+    "risk": {
+      "low": "Nothing too wild, please. My board is very conservative.",
+      "high": "Shake things up. Boring won't cut it."
+    }
+  },
+  "slogans": {
+    "softDrinks": [
+      { "text": "Pop the top on a sunny day.", "tag": "emotional" },
+      { "text": "So fizzy, it tickles your nose!", "tag": "humor" },
+      { "text": "Sing along, sip along.", "tag": "jingle" },
+      { "text": "The doctor's choice for thirst.", "tag": "testimonial" },
+      { "text": "Twice the fizz of the other guys.", "tag": "comparative" }
+    ],
+    "beer": [
+      { "text": "Brewed for the end of a long day.", "tag": "emotional" },
+      { "text": "It's not you. It's the beer talking.", "tag": "humor" },
+      { "text": "Pour a cold one, hum along.", "tag": "jingle" },
+      { "text": "Ask any bartender in town.", "tag": "testimonial" },
+      { "text": "More flavor than that watery stuff.", "tag": "comparative" }
+    ],
+    "detergent": [
+      { "text": "Clean clothes, happy home.", "tag": "emotional" },
+      { "text": "Even grass stains run away.", "tag": "humor" },
+      { "text": "Wash, rinse, sing, repeat.", "tag": "jingle" },
+      { "text": "Four out of five mothers agree.", "tag": "testimonial" },
+      { "text": "Whiter whites than Brand X.", "tag": "comparative" }
+    ],
+    "automobile": [
+      { "text": "Drive home a dream.", "tag": "emotional" },
+      { "text": "So good, Al is practically giving them away.", "tag": "humor" },
+      { "text": "Honk if you love a bargain!", "tag": "jingle" },
+      { "text": "Our customers keep coming back.", "tag": "testimonial" },
+      { "text": "More miles per dollar than the competition.", "tag": "comparative" }
+    ]
+  },
+  "smallJobs": [
+    { "title": "Flyer for a furniture store", "client": "Lazy Bones Furniture" },
+    { "title": "Menu redesign", "client": "Rosie's Diner" },
+    { "title": "Grand opening poster", "client": "Kwik Mart" },
+    { "title": "Church bake sale leaflet", "client": "St. Agnes Parish" },
+    { "title": "Newspaper ad for a barbershop", "client": "Clip Joint" },
+    { "title": "Bowling league banner", "client": "Strike Zone Lanes" },
+    { "title": "Mail-order catalog copy", "client": "Hartley's Hardware" },
+    { "title": "Radio spot for a car wash", "client": "Suds City" }
+  ],
+  "firstNames": ["Peggy", "Stan", "Joan", "Harry", "Ken", "Dottie", "Walt", "Ruth", "Frank", "Linda", "Sal", "Marge", "Ted", "Bev", "Lou", "Carol", "Gus", "Nora", "Duck", "Faye"],
+  "lastNames": ["Olsen", "Rizzo", "Holloway", "Crane", "Cosgrove", "Barrett", "Kinsey", "Romano", "Draper", "Pryce", "Gleason", "Hayes", "Murphy", "Lang", "Whitman", "Novak"],
+  "magazines": ["Ad Weak", "Campaign Trail"]
+}
