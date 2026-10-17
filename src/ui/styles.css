@@ -154,8 +154,15 @@ p { margin: 0 0 10px; line-height: 1.45; }
 .hands.working .hand-l { animation: tap 0.28s ease-in-out infinite alternate; }
 .hands.working .hand-r { animation: tap 0.28s ease-in-out infinite alternate-reverse; }
 @keyframes tap { from { transform: translateY(0); } to { transform: translateY(-3px); } }
+.painted-worker { transform-box: fill-box; transform-origin: 50% 100%; animation: breathe 3.2s ease-in-out infinite alternate; }
+.painted-worker.working { animation: typing 0.32s ease-in-out infinite alternate; }
+@keyframes breathe { from { transform: scaleY(1); } to { transform: scaleY(1.008); } }
+@keyframes typing {
+  from { transform: translate(0, 0) rotate(0deg); }
+  to { transform: translate(0.6px, 1.6px) rotate(0.25deg); }
+}
 @media (prefers-reduced-motion: reduce) {
-  .char.working .head, .hands.working .hand-l, .hands.working .hand-r { animation: none; }
+  .char.working .head, .hands.working .hand-l, .hands.working .hand-r, .painted-worker { animation: none; }
 }
 
 .context-menu {
