@@ -15,16 +15,80 @@ export interface Candidate extends Omit<Staff, "id" | "isPlayer" | "xp"> {
   hireFee: number;
 }
 
+export type ClientSize = "small" | "medium" | "large";
+
 export interface Client {
   name: string;
   category: string;
+  size: ClientSize;
   budget: number; // 1-3 stars
+  loyalty: number; // 1-3 stars
   pickiness: number; // 1-3 stars
   risk: number; // hidden 0-1 risk appetite
+  fromYear?: number;
 }
+
+/** A client on contract: pays a yearly billing and expects campaigns. */
+export interface Account {
+  client: Client;
+  billing: number; // per contract year, paid monthly
+  expected: number; // campaigns per contract year
+  done: number;
+  free: number; // extra unpaid campaigns promised this year
+  sats: number[]; // satisfaction of this year's campaigns
+  goodwill: number; // event bonuses and penalties, added at renewal
+  sinceDay: number;
+  renewDay: number;
+}
+
+export interface Rival {
+  name: string;
+  strength: number; // 1-10
+}
+
+/** An open pitch: win it and the client becomes an account. */
+export interface Rfp {
+  id: number;
+  client: Client;
+  billing: number;
+  expected: number;
+  rivals: Rival[];
+  expiresDay: number;
+  accepted: boolean;
+  pitchBonus: number;
+}
+
+export interface PitchResult {
+  clientName: string;
+  score: number;
+  rivals: Rival[];
+  won: boolean;
+  lines: string[];
+}
+
+export interface Modifier {
+  kind: "approach" | "budget" | "speed" | "quality" | "rfp";
+  id?: string;
+  categories?: string[];
+  mult: number;
+  until: number;
+}
+
+export interface ActiveEvent {
+  id: string;
+  target: string | null; // client name for client events
+}
+
+export interface Loan {
+  payment: number;
+  monthsLeft: number;
+}
+
+export type BriefKind = "trial" | "account" | "rfp";
 
 export interface Brief {
   id: number;
+  kind: BriefKind; // trial briefs pay a fee; account and pitch work is covered by billing
   client: Client;
   objective: Objective;
   audience: string; // what the client is really after, hinted in text
@@ -148,7 +212,7 @@ export interface Unlocks {
 }
 
 export interface GameState {
-  version: 2;
+  version: 3;
   seed: number;
   rng: number;
   day: number;
@@ -173,6 +237,18 @@ export interface GameState {
   nextId: number;
   negativeMonths: number;
   yearProfit: number;
+  accounts: Account[];
+  sectors: string[]; // categories opened by winning a first client there
+  known: string[]; // clients whose Loyalty and Pickiness we have seen
+  lostClients: string[]; // former accounts; they won't come back as trial briefs
+  rfp: Rfp | null;
+  pitch: PitchResult | null; // pitch outcome the UI should present
+  event: ActiveEvent | null;
+  eventQueue: ActiveEvent[];
+  eventLog: Record<string, number>; // event id -> last day it fired
+  flags: string[];
+  mods: Modifier[];
+  loans: Loan[];
   over: null | "bankrupt" | "sliceEnd";
 }
 

@@ -1,172 +1,439 @@
 {
   "clients": [
     {
-      "name": "Sunny Day Soda Co.",
+      "name": "Lola Coca",
       "category": "softDrinks",
-      "budget": 1,
-      "pickiness": 1,
-      "risk": 0.6
-    },
-    {
-      "name": "Fizzwell Bottling",
-      "category": "softDrinks",
-      "budget": 2,
-      "pickiness": 2,
+      "size": "large",
+      "budget": 3,
+      "loyalty": 1,
+      "pickiness": 3,
       "risk": 0.4
     },
     {
-      "name": "Dr. Bubbles",
+      "name": "Pepso Cola",
       "category": "softDrinks",
-      "budget": 2,
-      "pickiness": 3,
-      "risk": 0.8
-    },
-    {
-      "name": "Old Barrel Brewery",
-      "category": "beer",
-      "budget": 1,
-      "pickiness": 2,
-      "risk": 0.3
-    },
-    {
-      "name": "Hopfield Lager",
-      "category": "beer",
-      "budget": 2,
+      "size": "large",
+      "budget": 3,
+      "loyalty": 1,
       "pickiness": 2,
       "risk": 0.7
     },
     {
-      "name": "Brewster & Sons",
-      "category": "beer",
+      "name": "Dr. Pepperton",
+      "category": "softDrinks",
+      "size": "medium",
       "budget": 2,
-      "pickiness": 3,
-      "risk": 0.2
-    },
-    {
-      "name": "Sparkle Suds",
-      "category": "detergent",
-      "budget": 1,
-      "pickiness": 1,
-      "risk": 0.3
-    },
-    {
-      "name": "Mrs. Tidwell's Soap",
-      "category": "detergent",
-      "budget": 1,
+      "loyalty": 2,
       "pickiness": 2,
-      "risk": 0.1
+      "risk": 0.8
     },
     {
-      "name": "Brite-O Laundry",
-      "category": "detergent",
+      "name": "Shasty Soda",
+      "category": "softDrinks",
+      "size": "small",
+      "budget": 1,
+      "loyalty": 3,
+      "pickiness": 1,
+      "risk": 0.5
+    },
+    {
+      "name": "Budwiser",
+      "category": "beer",
+      "size": "large",
+      "budget": 3,
+      "loyalty": 1,
+      "pickiness": 3,
+      "risk": 0.4
+    },
+    {
+      "name": "Schlitzer Brewing",
+      "category": "beer",
+      "size": "medium",
       "budget": 2,
+      "loyalty": 2,
       "pickiness": 2,
       "risk": 0.5
     },
     {
-      "name": "Big Al's Motors",
-      "category": "automobile",
+      "name": "Smirnow Vodka",
+      "category": "beer",
+      "size": "medium",
+      "budget": 2,
+      "loyalty": 1,
+      "pickiness": 2,
+      "risk": 0.7
+    },
+    {
+      "name": "Cours Banquet Beer",
+      "category": "beer",
+      "size": "small",
       "budget": 1,
+      "loyalty": 3,
+      "pickiness": 1,
+      "risk": 0.4
+    },
+    {
+      "name": "Marlbrow",
+      "category": "tobacco",
+      "size": "large",
+      "budget": 3,
+      "loyalty": 2,
+      "pickiness": 3,
+      "risk": 0.3
+    },
+    {
+      "name": "Winstone",
+      "category": "tobacco",
+      "size": "large",
+      "budget": 3,
+      "loyalty": 1,
+      "pickiness": 2,
+      "risk": 0.5
+    },
+    {
+      "name": "Camelot Cigarettes",
+      "category": "tobacco",
+      "size": "medium",
+      "budget": 2,
+      "loyalty": 2,
+      "pickiness": 2,
+      "risk": 0.6
+    },
+    {
+      "name": "Virginia Slender",
+      "category": "tobacco",
+      "size": "small",
+      "budget": 1,
+      "loyalty": 3,
       "pickiness": 1,
       "risk": 0.7
     },
     {
-      "name": "Honest Ed's Used Cars",
+      "name": "General Motorworks",
       "category": "automobile",
+      "size": "large",
+      "budget": 3,
+      "loyalty": 1,
+      "pickiness": 3,
+      "risk": 0.2
+    },
+    {
+      "name": "Fard Motor Co.",
+      "category": "automobile",
+      "size": "large",
+      "budget": 3,
+      "loyalty": 2,
+      "pickiness": 3,
+      "risk": 0.4
+    },
+    {
+      "name": "Volksauto",
+      "category": "automobile",
+      "size": "medium",
+      "budget": 2,
+      "loyalty": 3,
+      "pickiness": 3,
+      "risk": 0.9
+    },
+    {
+      "name": "Datsan",
+      "category": "automobile",
+      "size": "small",
       "budget": 1,
+      "loyalty": 3,
+      "pickiness": 1,
+      "risk": 0.5
+    },
+    {
+      "name": "Pan Americana",
+      "category": "airline",
+      "size": "large",
+      "budget": 3,
+      "loyalty": 1,
+      "pickiness": 3,
+      "risk": 0.5
+    },
+    {
+      "name": "Braniffic Airways",
+      "category": "airline",
+      "size": "medium",
+      "budget": 2,
+      "loyalty": 2,
       "pickiness": 2,
       "risk": 0.9
     },
     {
-      "name": "Crestline Motor Co.",
-      "category": "automobile",
+      "name": "Eastward Airlines",
+      "category": "airline",
+      "size": "medium",
       "budget": 2,
-      "pickiness": 3,
-      "risk": 0.3
+      "loyalty": 1,
+      "pickiness": 2,
+      "risk": 0.4
     },
     {
-      "name": "Burger Barn",
-      "category": "fastFood",
+      "name": "Southwestly Air",
+      "category": "airline",
+      "size": "small",
       "budget": 1,
+      "loyalty": 3,
       "pickiness": 1,
+      "risk": 0.8,
+      "fromYear": 1971
+    },
+    {
+      "name": "IBN Business Machines",
+      "category": "tech",
+      "size": "large",
+      "budget": 3,
+      "loyalty": 2,
+      "pickiness": 3,
+      "risk": 0.1
+    },
+    {
+      "name": "Zeroxx Copiers",
+      "category": "tech",
+      "size": "medium",
+      "budget": 2,
+      "loyalty": 2,
+      "pickiness": 3,
+      "risk": 0.4
+    },
+    {
+      "name": "Polaroyd",
+      "category": "tech",
+      "size": "medium",
+      "budget": 2,
+      "loyalty": 2,
+      "pickiness": 2,
       "risk": 0.6
     },
     {
-      "name": "Mama Rosa's Pizza",
-      "category": "fastFood",
+      "name": "Apricot Computer",
+      "category": "tech",
+      "size": "small",
       "budget": 1,
+      "loyalty": 2,
       "pickiness": 2,
-      "risk": 0.3
+      "risk": 0.9,
+      "fromYear": 1977
     },
     {
-      "name": "Chicken Shack Inc.",
+      "name": "McDougal's",
       "category": "fastFood",
+      "size": "large",
+      "budget": 3,
+      "loyalty": 1,
+      "pickiness": 3,
+      "risk": 0.5
+    },
+    {
+      "name": "Burger Monarch",
+      "category": "fastFood",
+      "size": "medium",
       "budget": 2,
+      "loyalty": 2,
       "pickiness": 2,
       "risk": 0.7
     },
     {
-      "name": "Velvet Rose Cosmetics",
-      "category": "cosmetics",
-      "budget": 1,
-      "pickiness": 3,
-      "risk": 0.5
-    },
-    {
-      "name": "Glamour Girl Beauty",
-      "category": "cosmetics",
+      "name": "Colonel's Fried Chicken",
+      "category": "fastFood",
+      "size": "medium",
       "budget": 2,
-      "pickiness": 3,
-      "risk": 0.8
-    },
-    {
-      "name": "Maison Belle",
-      "category": "cosmetics",
-      "budget": 2,
+      "loyalty": 2,
       "pickiness": 2,
       "risk": 0.4
     },
     {
-      "name": "Tiny Town Toys",
-      "category": "toys",
+      "name": "Wendell's Burgers",
+      "category": "fastFood",
+      "size": "small",
       "budget": 1,
+      "loyalty": 3,
       "pickiness": 1,
-      "risk": 0.5
+      "risk": 0.6
     },
     {
-      "name": "Wonder Wagon Co.",
-      "category": "toys",
+      "name": "Revlorn",
+      "category": "cosmetics",
+      "size": "large",
+      "budget": 3,
+      "loyalty": 1,
+      "pickiness": 3,
+      "risk": 0.7
+    },
+    {
+      "name": "Avonne Calling",
+      "category": "cosmetics",
+      "size": "medium",
       "budget": 2,
+      "loyalty": 3,
+      "pickiness": 2,
+      "risk": 0.3
+    },
+    {
+      "name": "Clairall",
+      "category": "cosmetics",
+      "size": "medium",
+      "budget": 2,
+      "loyalty": 2,
+      "pickiness": 2,
+      "risk": 0.8
+    },
+    {
+      "name": "Maybelle",
+      "category": "cosmetics",
+      "size": "small",
+      "budget": 1,
+      "loyalty": 2,
       "pickiness": 2,
       "risk": 0.6
     },
     {
-      "name": "Kiddo Kingdom",
-      "category": "toys",
-      "budget": 1,
-      "pickiness": 2,
-      "risk": 0.4
-    },
-    {
-      "name": "Main Street Savings",
-      "category": "banking",
-      "budget": 1,
-      "pickiness": 2,
-      "risk": 0.1
-    },
-    {
-      "name": "First Federal Trust",
-      "category": "banking",
-      "budget": 2,
+      "name": "Procter & Gambit",
+      "category": "detergent",
+      "size": "large",
+      "budget": 3,
+      "loyalty": 2,
       "pickiness": 3,
       "risk": 0.2
     },
     {
-      "name": "Pioneer Credit Union",
-      "category": "banking",
-      "budget": 1,
-      "pickiness": 1,
+      "name": "Leaver Bros.",
+      "category": "detergent",
+      "size": "large",
+      "budget": 3,
+      "loyalty": 1,
+      "pickiness": 2,
+      "risk": 0.4
+    },
+    {
+      "name": "Colgait-Palmer",
+      "category": "detergent",
+      "size": "medium",
+      "budget": 2,
+      "loyalty": 2,
+      "pickiness": 2,
       "risk": 0.3
+    },
+    {
+      "name": "Ajaks Cleanser",
+      "category": "detergent",
+      "size": "small",
+      "budget": 1,
+      "loyalty": 3,
+      "pickiness": 1,
+      "risk": 0.6
+    },
+    {
+      "name": "Mattle",
+      "category": "toys",
+      "size": "large",
+      "budget": 3,
+      "loyalty": 1,
+      "pickiness": 2,
+      "risk": 0.6
+    },
+    {
+      "name": "Hasbrow",
+      "category": "toys",
+      "size": "medium",
+      "budget": 2,
+      "loyalty": 2,
+      "pickiness": 2,
+      "risk": 0.5
+    },
+    {
+      "name": "Atarii",
+      "category": "toys",
+      "size": "small",
+      "budget": 1,
+      "loyalty": 2,
+      "pickiness": 1,
+      "risk": 0.9,
+      "fromYear": 1972
+    },
+    {
+      "name": "Whammo",
+      "category": "toys",
+      "size": "small",
+      "budget": 1,
+      "loyalty": 3,
+      "pickiness": 1,
+      "risk": 0.8
+    },
+    {
+      "name": "Chaste Manhattan",
+      "category": "banking",
+      "size": "large",
+      "budget": 3,
+      "loyalty": 2,
+      "pickiness": 3,
+      "risk": 0.1
+    },
+    {
+      "name": "American Expressly",
+      "category": "banking",
+      "size": "large",
+      "budget": 3,
+      "loyalty": 2,
+      "pickiness": 3,
+      "risk": 0.3
+    },
+    {
+      "name": "Prudentious Insurance",
+      "category": "banking",
+      "size": "medium",
+      "budget": 2,
+      "loyalty": 3,
+      "pickiness": 2,
+      "risk": 0.2
+    },
+    {
+      "name": "First Savings of Queens",
+      "category": "banking",
+      "size": "small",
+      "budget": 1,
+      "loyalty": 3,
+      "pickiness": 1,
+      "risk": 0.2
+    },
+    {
+      "name": "Exxo",
+      "category": "oil",
+      "size": "large",
+      "budget": 3,
+      "loyalty": 1,
+      "pickiness": 3,
+      "risk": 0.2
+    },
+    {
+      "name": "Texacko",
+      "category": "oil",
+      "size": "medium",
+      "budget": 2,
+      "loyalty": 2,
+      "pickiness": 2,
+      "risk": 0.4
+    },
+    {
+      "name": "Shellby Oil",
+      "category": "oil",
+      "size": "medium",
+      "budget": 2,
+      "loyalty": 2,
+      "pickiness": 2,
+      "risk": 0.3
+    },
+    {
+      "name": "Sunny Oil",
+      "category": "oil",
+      "size": "small",
+      "budget": 1,
+      "loyalty": 2,
+      "pickiness": 1,
+      "risk": 0.5
     }
   ],
   "hints": {
@@ -452,6 +719,126 @@
       },
       {
         "text": "Is your money safe under that mattress?",
+        "tag": "shock"
+      }
+    ],
+    "tobacco": [
+      {
+        "text": "A moment that's all yours.",
+        "tag": "emotional"
+      },
+      {
+        "text": "Doctors smoke them. Don't ask us why.",
+        "tag": "humor"
+      },
+      {
+        "text": "Light up, light up, the flavor's here!",
+        "tag": "jingle"
+      },
+      {
+        "text": "Rodeo champion Hank Morrow: \"It's my brand.\"",
+        "tag": "testimonial"
+      },
+      {
+        "text": "Twice the flavor. Half the cough.",
+        "tag": "comparative"
+      },
+      {
+        "text": "Where the open range begins.",
+        "tag": "lifestyle"
+      },
+      {
+        "text": "You only live once. Make it count.",
+        "tag": "shock"
+      }
+    ],
+    "airline": [
+      {
+        "text": "Bring them home for the holidays.",
+        "tag": "emotional"
+      },
+      {
+        "text": "Our pilots have never once gotten lost. On purpose.",
+        "tag": "humor"
+      },
+      {
+        "text": "Wings and smiles, a thousand miles!",
+        "tag": "jingle"
+      },
+      {
+        "text": "Barbara has flown two million miles with us. Ask her.",
+        "tag": "testimonial"
+      },
+      {
+        "text": "More legroom than the other guys. We measured.",
+        "tag": "comparative"
+      },
+      {
+        "text": "Breakfast in New York. Dinner in Paris.",
+        "tag": "lifestyle"
+      },
+      {
+        "text": "Life is short. Your flight shouldn't be.",
+        "tag": "shock"
+      }
+    ],
+    "tech": [
+      {
+        "text": "Because some memories shouldn't fade.",
+        "tag": "emotional"
+      },
+      {
+        "text": "It thinks so you don't have to. Don't tell your boss.",
+        "tag": "humor"
+      },
+      {
+        "text": "Click, whirr, beep, it's yours to keep!",
+        "tag": "jingle"
+      },
+      {
+        "text": "Trusted by nine out of ten accountants.",
+        "tag": "testimonial"
+      },
+      {
+        "text": "Faster than the old way. Ask your secretary.",
+        "tag": "comparative"
+      },
+      {
+        "text": "The office of tomorrow, on your desk today.",
+        "tag": "lifestyle"
+      },
+      {
+        "text": "Your competitor already bought one.",
+        "tag": "shock"
+      }
+    ],
+    "oil": [
+      {
+        "text": "Keeping America moving since your grandfather's day.",
+        "tag": "emotional"
+      },
+      {
+        "text": "So good your car might write us a thank-you note.",
+        "tag": "humor"
+      },
+      {
+        "text": "Fill 'er up, fill 'er up, smile all the way!",
+        "tag": "jingle"
+      },
+      {
+        "text": "Trust the man at the pump.",
+        "tag": "testimonial"
+      },
+      {
+        "text": "Goes further than the station across the street.",
+        "tag": "comparative"
+      },
+      {
+        "text": "The open road is calling.",
+        "tag": "lifestyle"
+      },
+      {
+        "text": "Run out of gas? Not on our watch.",
         "tag": "shock"
       }
     ]

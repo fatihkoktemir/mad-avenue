@@ -5,7 +5,7 @@ import { PAINTED_H, PAINTED_HEAD, PAINTED_W, PaintedRoom } from "./scene/Painted
 import { store } from "./store";
 
 export type MenuAction =
-  | "briefs" | "smallJobs" | "staff" | "research" | "office" | "handbook" | "results";
+  | "briefs" | "accounts" | "smallJobs" | "staff" | "research" | "office" | "handbook" | "results";
 
 export function Office({ state, onMenu }: { state: GameState; onMenu: (a: MenuAction) => void }) {
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
@@ -36,7 +36,8 @@ export function Office({ state, onMenu }: { state: GameState; onMenu: (a: MenuAc
       {store.paused && <div className="paused-badge">Paused</div>}
       {menu && (
         <div className="context-menu" style={{ left: menu.x, top: menu.y }} onClick={(e) => e.stopPropagation()}>
-          <button disabled={busy} onClick={() => pick("briefs")}>New Campaign</button>
+          <button disabled={busy} onClick={() => pick("briefs")}>Briefs</button>
+          <button onClick={() => pick("accounts")}>Accounts</button>
           <button disabled={busy} onClick={() => pick("smallJobs")}>Small Jobs</button>
           <button onClick={() => pick("staff")}>Staff</button>
           <button onClick={() => pick("research")}>Research</button>

@@ -3,6 +3,7 @@ import { STAGES, nameOf } from "../sim/content";
 import { dateOf, formatDate } from "../sim/calendar";
 import { SLICE_END_YEAR } from "../sim/game";
 import type { GameState } from "../sim/types";
+import { AccountsPanel, EventModal, PitchModal } from "./Accounts";
 import { BriefsPanel, CampaignDecision, RevisingBar } from "./CampaignFlow";
 import { Modal } from "./common";
 import { Office, type MenuAction } from "./Office";
@@ -36,6 +37,9 @@ function Game({ state }: { state: GameState }) {
         </div>
         <div className="hud hud-right">
           <div className="row">
+            <button className={`pill${state.rfp && !state.rfp.accepted ? " alert" : ""}`} onClick={() => setPanel("accounts")}>
+              Accounts{state.rfp && !state.rfp.accepted ? " · Pitch!" : ""}
+            </button>
             <button className="round" onClick={() => store.togglePause()} aria-label={store.paused ? "Resume" : "Pause"}>{store.paused ? "▶" : "❚❚"}</button>
             <button className="round" onClick={() => setPanel("handbook")} aria-label="Agency Handbook">?</button>
           </div>
@@ -54,6 +58,7 @@ function Game({ state }: { state: GameState }) {
       </div>
 
       {panel === "briefs" && <BriefsPanel state={state} onClose={close} />}
+      {panel === "accounts" && <AccountsPanel state={state} onClose={close} />}
       {panel === "smallJobs" && <SmallJobsPanel state={state} onClose={close} />}
       {panel === "staff" && <StaffPanel state={state} onClose={close} />}
       {panel === "research" && <ResearchPanel state={state} onClose={close} />}
@@ -61,7 +66,9 @@ function Game({ state }: { state: GameState }) {
       {panel === "handbook" && <HandbookPanel state={state} onClose={close} />}
       {panel === "results" && <ResultsPanel state={state} onClose={close} />}
 
-      {!panel && <CampaignDecision state={state} />}
+      {!panel && !state.event && !state.pitch && <CampaignDecision state={state} />}
+      {!panel && !result && <PitchModal state={state} />}
+      {!panel && !result && !state.pitch && <EventModal state={state} />}
       {result && <ResultModal key={result.id} result={result} />}
       {state.over && <GameOver state={state} />}
     </div>
@@ -89,7 +96,8 @@ function BottomBar({ state, onMenu }: { state: GameState; onMenu: (a: MenuAction
     return (
       <footer className="bottombar">
         <span className="muted">The team is free. Click the office or pick something:</span>
-        <button className="primary" onClick={() => onMenu("briefs")}>New Campaign ({state.briefs.length})</button>
+        <button className="primary" onClick={() => onMenu("briefs")}>Briefs ({state.briefs.length})</button>
+        <button className="primary" onClick={() => onMenu("accounts")}>Accounts ({state.accounts.length})</button>
         <button onClick={() => onMenu("smallJobs")}>Small Jobs ({state.smallJobs.length})</button>
         <button className="secondary" onClick={() => onMenu("research")}>Research</button>
         <button className="secondary" onClick={() => onMenu("staff")}>Staff</button>
@@ -143,7 +151,7 @@ function TitleScreen() {
         <button className="primary" onClick={() => store.start({ agencyName: agency.trim() || "Mad Avenue Advertising Co.", playerName: player.trim() || "Don" })}>
           Open the doors
         </button>
-        <p className="small muted">Alpha build: 1970 to {SLICE_END_YEAR - 1}, the campaign loop only. Accounts, pitches and events come next.</p>
+        <p className="small muted">Alpha build: 1970 to {SLICE_END_YEAR - 1}. Campaigns, accounts, pitches and events.</p>
       </div>
     </div>
   );
@@ -163,6 +171,7 @@ function GameOver({ state }: { state: GameState }) {
         <tr><td>Best campaign</td><td><b>{best ? `${best.name} (${best.satisfaction.toFixed(1)})` : "-"}</b></td></tr>
         <tr><td>Cash</td><td><b>{money(state.cash)}</b></td></tr>
         <tr><td>Staff</td><td><b>{state.staff.length}</b></td></tr>
+        <tr><td>Accounts</td><td><b>{state.accounts.length}</b></td></tr>
       </tbody></table>
       <div className="row" style={{ justifyContent: "flex-end", marginTop: 16 }}>
         <button className="primary" onClick={() => store.quit()}>New game</button>

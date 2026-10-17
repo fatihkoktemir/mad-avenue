@@ -38,7 +38,7 @@ export interface DayOutput {
 }
 
 /** One day of work by the whole team on the current stage. Mutates the project. */
-export function workDay(p: CampaignProject, staff: Staff[], rng: Rng): DayOutput[] {
+export function workDay(p: CampaignProject, staff: Staff[], rng: Rng, speedMult = 1): DayOutput[] {
   const stage = STAGES[p.stage];
   const shares = p.allocs[p.stage];
   const out: DayOutput[] = [];
@@ -47,7 +47,7 @@ export function workDay(p: CampaignProject, staff: Staff[], rng: Rng): DayOutput
     const area = stage.areas[i];
     const kind = AREAS[area].kind;
     const skill = kind === "c" ? st.creativity : kind === "s" ? st.strategy : (st.creativity + st.strategy) / 2;
-    const amount = (skill / 10) * st.speed * rng.range(0.8, 1.2);
+    const amount = (skill / 10) * st.speed * speedMult * rng.range(0.8, 1.2);
     const c = kind === "c" ? amount : kind === "both" ? amount / 2 : 0;
     const s = kind === "s" ? amount : kind === "both" ? amount / 2 : 0;
     p.areaPoints[area] += amount;
@@ -103,13 +103,14 @@ export function pairArgs(pair: FitPair, cat: string, appr: string, chan: string,
 }
 
 const clamp = (x: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, x));
-const toTen = (x: number) => Math.round(clamp(1 + 9 * Math.pow(clamp(x, 0, 1), 1.4), 1, 10) * 10) / 10;
+export const toTen = (x: number) => Math.round(clamp(1 + 9 * Math.pow(clamp(x, 0, 1), 1.4), 1, 10) * 10) / 10;
 
 export interface EvalContext {
   day: number;
   bestCore: number;
   rng: Rng;
   id: number;
+  coreMult?: number; // event modifiers (trends, creative boosts)
 }
 
 export function evaluate(p: CampaignProject, ctx: EvalContext): CampaignResult {
@@ -143,7 +144,7 @@ export function evaluate(p: CampaignProject, ctx: EvalContext): CampaignResult {
 
   const sloganBonus = setup.sloganTag === setup.approach ? 1.05 : 1;
   const notesPenalty = 1 - clamp(p.notes / (target * 0.15), 0, 0.3);
-  const core = quality * (0.25 + 0.75 * matrixFit) * (0.4 + 0.6 * sliderFit) * sloganBonus * notesPenalty;
+  const core = quality * (0.25 + 0.75 * matrixFit) * (0.4 + 0.6 * sliderFit) * sloganBonus * notesPenalty * (ctx.coreMult ?? 1);
 
   const wasRecord = ctx.bestCore > 0 && core > ctx.bestCore;
   const late = Math.max(0, Math.ceil((ctx.day - p.deadlineDay) / DAYS_PER_WEEK));
@@ -224,6 +225,36 @@ export function evaluate(p: CampaignProject, ctx: EvalContext): CampaignResult {
     discovered: fits.map((f) => ({ key: fitKey(f.pair, f.a, f.b), label: fitLabel(f.pair, f.a, f.b), fit: f.fit })),
     knowledge,
   };
+}
+
+/**
+ * Score a pitch from the Strategy stage alone: the strategic work done so far,
+ * how well the approach, channel and audience suit the client, and whether the
+ * effort went into the right areas.
+ */
+export function pitchScore(p: CampaignProject, day: number, coreMult = 1): { score: number; lines: string[] } {
+  const { brief, setup } = p;
+  const sc = scale(brief.scale);
+  const ch = channel(setup.channel);
+  const cat = brief.client.category;
+  const years = day / (DAYS_PER_WEEK * 48);
+  const target = (sc.target * (1 + 0.04 * years)) / 3;
+  const useful = STAGES[0].areas.reduce((sum, a) => sum + p.areaPoints[a] * ch.useful[a], 0);
+  const quality = clamp(useful / target, 0, 1.2);
+  const ideal = idealShares(setup.approach, setup.channel, 0);
+  const sliderFit = 1 - p.allocs[0].reduce((sum, x, j) => sum + Math.abs(x - ideal[j]), 0) / 2;
+  const matrixFit = FIT_PAIRS.reduce((sum, { pair, weight }) => {
+    const [a, b] = pairArgs(pair, cat, setup.approach, setup.channel, setup.audience);
+    return sum + weight * FIT_VALUE[fitOf(pair, a, b)];
+  }, 0);
+  const audienceFit = setup.audience === brief.audience ? 1 : 0.8;
+  const raw = quality * (0.25 + 0.75 * matrixFit) * (0.4 + 0.6 * sliderFit) * audienceFit * coreMult;
+  const lines: string[] = [];
+  lines.push(quality >= 0.9 ? "The research behind the pitch was thorough." : "The pitch felt underprepared.");
+  lines.push(matrixFit >= 0.75 ? `${nameOf(setup.approach)} on ${ch.name} suits ${nameOf(cat)}.` : `They weren't sold on ${nameOf(setup.approach)} on ${ch.name} for ${nameOf(cat)}.`);
+  if (sliderFit < 0.8) lines.push("The strategy work went into the wrong places.");
+  if (setup.audience !== brief.audience) lines.push(`They wanted to hear about ${nameOf(brief.audience)}.`);
+  return { score: toTen(raw), lines };
 }
 
 export function fitLabel(_pair: FitPair, a: string, b: string): string {

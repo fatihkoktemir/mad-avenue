@@ -1,25 +1,27 @@
 import {
-  APPROACHES, AUDIENCES, CHANNELS, CLIENTS, EXTRAS, FIRST_NAMES, HINTS, LAST_NAMES,
+  APPROACHES, AUDIENCES, CHANNELS, EXTRAS, FIRST_NAMES, LAST_NAMES,
   SCALES, SMALL_JOBS, STAGES, channel, extra, researchItem, scale,
-  type Objective,
 } from "./content";
 import {
   DAYS_PER_MONTH, DAYS_PER_WEEK, DAYS_PER_YEAR, START_YEAR, dateOf, inflation,
 } from "./calendar";
 import {
-  applyExtra, briefDeadline, emptyAreaPoints, evaluate, normalize, productionCost, workDay,
+  applyExtra, briefDeadline, emptyAreaPoints, evaluate, normalize, pitchScore, productionCost, workDay,
   type DayOutput,
 } from "./campaign";
+import {
+  acceptRfp, accountOf, checkRenewals, declineRfp, makeTrialBrief, maybeOpenRfp, monthlyBilling,
+  requestAccountCampaign, signAccount,
+} from "./accounts";
+import { chooseEventOption, queueEvent, weeklyEvents } from "./events";
+import { OFFICES, modMult, nextId, notify } from "./util";
 import { Rng } from "./rng";
 import type {
-  Brief, Candidate, CampaignProject, CampaignSetup, GameState, Notice, SmallJob, Staff,
+  Brief, Candidate, CampaignProject, CampaignSetup, GameState, SmallJob, Staff,
 } from "./types";
 
+export { OFFICES, notify };
 export const SLICE_END_YEAR = 1981;
-export const OFFICES = [
-  { name: "Single Room", capacity: 1, rent: 150, cost: 0 },
-  { name: "Small Office", capacity: 4, rent: 600, cost: 35000 },
-];
 
 export interface NewGameOptions {
   seed?: number;
@@ -30,7 +32,7 @@ export interface NewGameOptions {
 export function newGame(opts: NewGameOptions = {}): GameState {
   const seed = opts.seed ?? Math.floor(Math.random() * 2 ** 31);
   const state: GameState = {
-    version: 2,
+    version: 3,
     seed,
     rng: seed,
     day: 0,
@@ -62,6 +64,18 @@ export function newGame(opts: NewGameOptions = {}): GameState {
     nextId: 2,
     negativeMonths: 0,
     yearProfit: 0,
+    accounts: [],
+    sectors: [],
+    known: [],
+    lostClients: [],
+    rfp: null,
+    pitch: null,
+    event: null,
+    eventQueue: [],
+    eventLog: {},
+    flags: [],
+    mods: [],
+    loans: [],
     over: null,
   };
   const rng = new Rng(state.rng);
@@ -71,18 +85,9 @@ export function newGame(opts: NewGameOptions = {}): GameState {
   return state;
 }
 
-function nextId(s: GameState): number {
-  return s.nextId++;
-}
-
-export function notify(s: GameState, text: string, tone: Notice["tone"] = "info"): void {
-  s.notices.push({ id: nextId(s), day: s.day, text, tone });
-  if (s.notices.length > 40) s.notices.splice(0, s.notices.length - 40);
-}
-
 /** True when the game is waiting on a player decision and time should not move. */
 export function isBlocked(s: GameState): boolean {
-  if (s.over || s.pendingResult !== null) return true;
+  if (s.over || s.pendingResult !== null || s.event || s.pitch) return true;
   const p = s.project;
   return !!p && p.kind === "campaign" && (p.phase === "allocate" || p.phase === "extras" || p.phase === "revision");
 }
@@ -101,7 +106,7 @@ export function tick(s: GameState): TickEvents {
   progressProject(s, rng, events);
 
   if (s.day % DAYS_PER_WEEK === 0) weekly(s, rng);
-  if (s.day % DAYS_PER_MONTH === 0) monthly(s);
+  if (s.day % DAYS_PER_MONTH === 0) monthly(s, rng);
   if (s.day % DAYS_PER_YEAR === 0) yearly(s);
 
   s.rng = rng.state;
@@ -111,10 +116,11 @@ export function tick(s: GameState): TickEvents {
 function progressProject(s: GameState, rng: Rng, events: TickEvents): void {
   const p = s.project;
   if (!p) return;
+  const speed = modMult(s, "speed");
   if (p.kind === "smallJob") {
     for (const st of s.staff) {
-      const c = (st.creativity / 10) * st.speed * rng.range(0.8, 1.2) * 0.5;
-      const sp = (st.strategy / 10) * st.speed * rng.range(0.8, 1.2) * 0.5;
+      const c = (st.creativity / 10) * st.speed * speed * rng.range(0.8, 1.2) * 0.5;
+      const sp = (st.strategy / 10) * st.speed * speed * rng.range(0.8, 1.2) * 0.5;
       p.c += c;
       p.s += sp;
       events.work.push({ staffId: st.id, area: "production", c, s: sp, note: false });
@@ -138,7 +144,7 @@ function progressProject(s: GameState, rng: Rng, events: TickEvents): void {
   }
 
   if (p.phase === "running") {
-    events.work = workDay(p, s.staff, rng);
+    events.work = workDay(p, s.staff, rng, speed);
     p.stageDay += 1;
     if (p.stageDay >= p.stageDays) {
       p.stageDay = 0;
@@ -148,6 +154,7 @@ function progressProject(s: GameState, rng: Rng, events: TickEvents): void {
         p.stage += 1;
         p.stageDays = scale(p.brief.scale).stageDays;
         if (!hasExtras) p.allocs[p.stage] = defaultAlloc();
+        if (p.stage === 1 && p.brief.kind === "rfp") resolvePitch(s, p, rng);
       } else {
         p.phase = "revision";
       }
@@ -173,11 +180,57 @@ function weekly(s: GameState, rng: Rng): void {
 
   s.briefs = s.briefs.filter((b) => b.expiresDay > s.day);
   s.smallJobs = s.smallJobs.filter((j) => j.expiresDay > s.day);
-  if (s.briefs.length < 2 && rng.chance(0.35)) s.briefs.push(makeBrief(s, rng));
+  if (trialBriefs(s) < 2 && rng.chance(0.35)) addTrialBrief(s, rng);
   if (s.smallJobs.length < 3 && rng.chance(0.4)) s.smallJobs.push(makeSmallJob(s, rng));
+  s.mods = s.mods.filter((m) => m.until > s.day);
+
+  checkRenewals(s, (name) => queueEvent(s, "account_review", name));
+  weeklyEvents(s, rng);
 }
 
-function monthly(s: GameState): void {
+function trialBriefs(s: GameState): number {
+  return s.briefs.filter((b) => b.kind === "trial").length;
+}
+
+function addTrialBrief(s: GameState, rng: Rng): void {
+  const b = makeTrialBrief(s, rng);
+  if (b) s.briefs.push(b);
+}
+
+/** End of the Strategy stage on a pitch: the client picks an agency. */
+function resolvePitch(s: GameState, p: CampaignProject, rng: Rng): void {
+  const rfp = s.rfp;
+  const { score, lines } = pitchScore(p, s.day, coreMult(s, p));
+  const total = Math.min(10, Math.round((score + (rfp?.pitchBonus ?? 0) + Math.min(1, s.reputation / 40)) * 10) / 10);
+  const rivals = rfp?.rivals ?? [];
+  const best = Math.max(0, ...rivals.map((r) => r.strength));
+  const won = total + rng.range(-0.4, 0.4) >= best;
+  s.pitch = { clientName: p.brief.client.name, score: total, rivals, won, lines };
+  s.knowledge += 2;
+  if (won) {
+    signAccount(s, p.brief.client, rfp ? { billing: rfp.billing, expected: rfp.expected } : undefined);
+  } else {
+    notify(s, `We lost the ${p.brief.client.name} pitch to ${[...rivals].sort((a, b) => b.strength - a.strength)[0]?.name ?? "a rival"}.`, "bad");
+    s.project = null;
+  }
+  s.rfp = null;
+}
+
+function coreMult(s: GameState, p: CampaignProject): number {
+  return modMult(s, "approach", { id: p.setup.approach }) * modMult(s, "quality");
+}
+
+function monthly(s: GameState, rng: Rng): void {
+  const billing = monthlyBilling(s);
+  s.cash += billing;
+  s.yearProfit += billing;
+  for (const loan of s.loans) {
+    s.cash -= loan.payment;
+    s.yearProfit -= loan.payment;
+    loan.monthsLeft -= 1;
+  }
+  s.loans = s.loans.filter((l) => l.monthsLeft > 0);
+  maybeOpenRfp(s, rng);
   const bonus = Math.round(s.lifts.reduce((sum, l) => sum + l.pending, 0));
   s.cash += bonus;
   s.yearProfit += bonus;
@@ -215,36 +268,8 @@ function yearly(s: GameState): void {
 }
 
 export function refreshOffers(s: GameState, rng: Rng): void {
-  while (s.briefs.length < 2) s.briefs.push(makeBrief(s, rng));
+  for (let i = 0; i < 4 && trialBriefs(s) < 2; i++) addTrialBrief(s, rng);
   while (s.smallJobs.length < 2) s.smallJobs.push(makeSmallJob(s, rng));
-}
-
-function makeBrief(s: GameState, rng: Rng): Brief {
-  const scales = s.unlocks.scales;
-  const scaleId = scales.length > 1 && rng.chance(0.4 + Math.min(0.3, s.reputation / 60)) ? scales[scales.length - 1] : "local";
-  const pool = CLIENTS.filter((c) => (scaleId === "local" ? c.budget === 1 : c.budget >= 2));
-  const client = { ...rng.pick(pool) };
-  const objectives: Objective[] = ["awareness", "consideration", "steal"];
-  const objective = rng.pick(objectives);
-  const audienceId = rng.pick(AUDIENCES.map((a) => a.id));
-  const sc = scale(scaleId);
-  const repBoost = 1 + Math.min(0.5, s.reputation / 60);
-  const fee = Math.round((sc.fee * inflation(s.day) * repBoost * rng.range(0.85, 1.2)) / 50) * 50;
-  const hint = [rng.pick(HINTS.objective[objective]), rng.pick(HINTS.audience[audienceId])];
-  if (client.risk <= 0.25) hint.push(HINTS.risk.low);
-  if (client.risk >= 0.75) hint.push(HINTS.risk.high);
-  return {
-    id: nextId(s),
-    client,
-    objective,
-    audience: audienceId,
-    scale: scaleId,
-    fee,
-    bonusPct: Math.round(rng.range(0.06, 0.1) * 100) / 100,
-    deadlineWeeks: Math.round((sc.stageDays * 3) / DAYS_PER_WEEK) + rng.int(2, 3),
-    hint,
-    expiresDay: s.day + rng.int(4, 8) * DAYS_PER_WEEK,
-  };
 }
 
 function makeSmallJob(s: GameState, rng: Rng): SmallJob {
@@ -315,6 +340,8 @@ export function startCampaign(s: GameState, briefId: number, setup: CampaignSetu
   if (!s.unlocks.channels.includes(setup.channel)) return "Channel not available.";
   if (!s.unlocks.audiences.includes(setup.audience)) return "Audience not available.";
   const ch = channel(setup.channel);
+  const blocked = channelBlocked(s, brief, setup.channel);
+  if (blocked) return blocked;
   if (SCALES.findIndex((x) => x.id === brief.scale) < SCALES.findIndex((x) => x.id === ch.minScale)) {
     return `${ch.name} needs a bigger campaign.`;
   }
@@ -387,13 +414,23 @@ export function deliver(s: GameState): void {
   const p = s.project;
   if (!p || p.kind !== "campaign" || p.phase !== "revision") return;
   const rng = new Rng(s.rng);
-  const result = evaluate(p, { day: s.day, bestCore: s.bestCore, rng, id: nextId(s) });
+  const result = evaluate(p, { day: s.day, bestCore: s.bestCore, rng, id: nextId(s), coreMult: coreMult(s, p) });
   s.rng = rng.state;
   s.results.push(result);
   s.bestCore = Math.max(s.bestCore, result.core);
   for (const d of result.discovered) s.discovered[d.key] = d.fit;
-  s.cash += result.fee;
-  s.yearProfit += result.fee;
+  const client = p.brief.client;
+  if (!s.known.includes(client.name)) s.known.push(client.name);
+  const acc = accountOf(s, client.name);
+  if (p.brief.kind === "trial") {
+    // Trial work is paid per job; a happy client signs on.
+    s.cash += result.fee;
+    s.yearProfit += result.fee;
+    if (!acc && result.satisfaction >= TRIAL_SIGN_SATISFACTION) signAccount(s, client);
+  } else if (acc) {
+    acc.done += 1;
+    acc.sats.push(result.satisfaction);
+  }
   s.knowledge += result.knowledge;
   s.reputation = Math.max(0, s.reputation + (result.satisfaction - 5) * 1.2);
   s.lifts.push({ resultId: result.id, name: result.name, clientName: result.clientName, weeks: result.liftWeeks, week: 0, bonusPct: result.bonusPct, pending: 0, paid: 0 });
@@ -404,6 +441,42 @@ export function deliver(s: GameState): void {
 
 export function dismissResult(s: GameState): void {
   s.pendingResult = null;
+}
+
+/** Trial clients sign a contract when they're at least this happy. */
+export const TRIAL_SIGN_SATISFACTION = 6.5;
+
+export function channelBlocked(s: GameState, brief: Brief, channelId: string): string | null {
+  if (brief.client.category === "tobacco" && s.flags.includes("tobaccoBan") && (channelId === "tv" || channelId === "radio")) {
+    return "Cigarettes can't be advertised on radio or TV since 1971.";
+  }
+  return null;
+}
+
+export function requestCampaign(s: GameState, clientName: string): number | string {
+  const rng = new Rng(s.rng);
+  const out = requestAccountCampaign(s, rng, clientName);
+  s.rng = rng.state;
+  return out;
+}
+
+export function acceptPitch(s: GameState): number | string {
+  const rng = new Rng(s.rng);
+  const out = acceptRfp(s, rng);
+  s.rng = rng.state;
+  return out;
+}
+
+export function declinePitch(s: GameState): void {
+  declineRfp(s);
+}
+
+export function dismissPitch(s: GameState): void {
+  s.pitch = null;
+}
+
+export function chooseEvent(s: GameState, index: number): void {
+  chooseEventOption(s, index);
 }
 
 export function canResearch(s: GameState, id: string): string | null {

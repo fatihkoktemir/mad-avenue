@@ -5,7 +5,7 @@ import {
 } from "../sim/content";
 import { extraCost, fitKey, productionCost } from "../sim/campaign";
 import {
-  availableExtras, chooseExtras, deliver, revise, setAllocation, startCampaign, stopRevising,
+  availableExtras, channelBlocked, chooseExtras, deliver, revise, setAllocation, startCampaign, stopRevising,
 } from "../sim/game";
 import { formatDate } from "../sim/calendar";
 import type { Brief, CampaignProject, GameState } from "../sim/types";
@@ -29,6 +29,27 @@ export function BriefMemo({ brief }: { brief: Brief }) {
   );
 }
 
+const KIND_LABEL: Record<Brief["kind"], string> = { trial: "New client", account: "Account", rfp: "Pitch" };
+
+/** What the brief pays, in words. */
+export function payLine(brief: Brief): string {
+  const bonus = `${Math.round(brief.bonusPct * 100)}% of the Sales Lift`;
+  if (brief.kind === "trial") return `Fee ${money(brief.fee)} on delivery + ${bonus}. Do it well and they may sign a contract.`;
+  if (brief.kind === "rfp") return `Win the pitch after the Strategy stage and they sign. Bonus: ${bonus}.`;
+  return `Covered by their yearly billing. Bonus: ${bonus}.`;
+}
+
+export function ClientStars({ state, brief }: { state: GameState; brief: Brief }) {
+  const known = state.known.includes(brief.client.name);
+  return (
+    <>
+      <div>Budget <Stars n={brief.client.budget} /></div>
+      <div>Loyalty <Stars n={brief.client.loyalty} hidden={!known} /></div>
+      <div>Pickiness <Stars n={brief.client.pickiness} hidden={!known} /></div>
+    </>
+  );
+}
+
 export function BriefsPanel({ state, onClose }: { state: GameState; onClose: () => void }) {
   const [selected, setSelected] = useState<Brief | null>(null);
   if (selected) return <SetupModal state={state} brief={selected} onBack={() => setSelected(null)} onDone={onClose} />;
@@ -39,15 +60,13 @@ export function BriefsPanel({ state, onClose }: { state: GameState; onClose: () 
         {state.briefs.map((b) => (
           <div key={b.id} className="card stack">
             <div>
+              <span className={`tag ${b.kind}`}>{KIND_LABEL[b.kind]}</span>
               <h3>{b.client.name}</h3>
               <div className="small muted">{nameOf(b.client.category)} · {nameOf(b.scale)}</div>
             </div>
+            <div className="small"><ClientStars state={state} brief={b} /></div>
             <div className="small">
-              <div>Budget <Stars n={b.client.budget} /></div>
-              <div>Pickiness <Stars n={b.client.pickiness} /></div>
-            </div>
-            <div className="small">
-              Fee <b>{money(b.fee)}</b> + {Math.round(b.bonusPct * 100)}% of Sales Lift<br />
+              {payLine(b)}<br />
               Deadline {b.deadlineWeeks} weeks · Offer ends {formatDate(b.expiresDay)}
             </div>
             <button className="primary" onClick={() => setSelected(b)}>Read the brief</button>
@@ -81,11 +100,11 @@ function Choice<T extends string>(props: {
   );
 }
 
-function SetupModal({ state, brief, onBack, onDone }: { state: GameState; brief: Brief; onBack: () => void; onDone: () => void }) {
+export function SetupModal({ state, brief, onBack, onDone }: { state: GameState; brief: Brief; onBack: () => void; onDone: () => void }) {
   const u = state.unlocks;
   const cat = brief.client.category;
   const scaleIdx = SCALES.findIndex((s) => s.id === brief.scale);
-  const channelOk = (id: string) => u.channels.includes(id) && SCALES.findIndex((s) => s.id === channelDef(id).minScale) <= scaleIdx;
+  const channelOk = (id: string) => u.channels.includes(id) && SCALES.findIndex((s) => s.id === channelDef(id).minScale) <= scaleIdx && !channelBlocked(state, brief, id);
 
   const [approach, setApproach] = useState(u.approaches[0]);
   const [channel, setChannel] = useState(CHANNELS.find((c) => channelOk(c.id))!.id);
@@ -116,8 +135,8 @@ function SetupModal({ state, brief, onBack, onDone }: { state: GameState; brief:
         <div className="stack">
           <BriefMemo brief={brief} />
           <div className="small">
-            <div>Budget <Stars n={brief.client.budget} /> · Pickiness <Stars n={brief.client.pickiness} /></div>
-            <div>Fee {money(brief.fee)} on delivery, plus {Math.round(brief.bonusPct * 100)}% of the Sales Lift as bonus.</div>
+            <div className="row"><ClientStars state={state} brief={brief} /></div>
+            <div>{payLine(brief)}</div>
             <div>Deadline: {brief.deadlineWeeks} weeks from today.</div>
           </div>
           <label className="stack small">
@@ -172,7 +191,7 @@ function SetupModal({ state, brief, onBack, onDone }: { state: GameState; brief:
         </div>
       </div>
       <div className="spread" style={{ marginTop: 18 }}>
-        <button className="secondary" onClick={onBack}>Back to briefs</button>
+        <button className="secondary" onClick={onBack}>Back</button>
         <div className="row">
           {error && <span className="error">{error}</span>}
           <span className="small">Production cost: <b>{money(cost)}</b></span>

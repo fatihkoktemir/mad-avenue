@@ -1,5 +1,6 @@
 import campaign from "../content/campaign.json";
 import clients from "../content/clients.json";
+import events from "../content/events.json";
 
 export type AreaId =
   | "research" | "positioning" | "bigIdea"
@@ -60,7 +61,8 @@ export interface ResearchItem {
   requires?: string; requiresOffice?: number;
 }
 export interface ClientDef {
-  name: string; category: string; budget: number; pickiness: number; risk: number;
+  name: string; category: string; size: "small" | "medium" | "large";
+  budget: number; loyalty: number; pickiness: number; risk: number; fromYear?: number;
 }
 export interface Slogan { text: string; tag: string }
 
@@ -80,6 +82,32 @@ export const HINTS = clients.hints as {
   objective: Record<Objective, string[]>;
   risk: { low: string; high: string };
 };
+export type EventEffect = Record<string, unknown>;
+export interface EventOption { label: string; effects: EventEffect[]; result?: string }
+export interface EventTrigger {
+  date?: [number, number];
+  system?: boolean;
+  category?: string;
+  anyAccount?: boolean;
+  minYear?: number;
+  minStaff?: number;
+  minResults?: number;
+  rfpOpen?: boolean;
+  goodResult?: boolean;
+  flag?: string;
+  clientNotAccount?: string;
+  weight?: number;
+  cooldownWeeks?: number;
+}
+export interface EventDef {
+  id: string; title: string; text: string;
+  trigger: EventTrigger; effects?: EventEffect[]; options: EventOption[];
+}
+export const EVENTS = events.events as unknown as EventDef[];
+export const eventDef = (id: string) => byId(EVENTS, id);
+
+export const RIVALS = ["Sterling Crane", "McCan Erickson", "Doyle Dane & Burnback"];
+
 export const SLOGANS = clients.slogans as Record<string, Slogan[]>;
 export const SMALL_JOBS = clients.smallJobs as { title: string; client: string }[];
 export const FIRST_NAMES = clients.firstNames;

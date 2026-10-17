@@ -1,0 +1,220 @@
+{
+  "events": [
+    {
+      "id": "cigarette_ban",
+      "title": "Smoke Gets in Your Eyes",
+      "text": "Congress has done it. From today, cigarettes can no longer be advertised on television or radio. The tobacco men are furious, and their budgets are looking for a new home.",
+      "trigger": { "date": [1971, 1] },
+      "effects": [{ "flag": "tobaccoBan" }],
+      "options": [
+        { "label": "Move them to billboards and magazines", "effects": [{ "loyaltyCategory": "tobacco", "amount": 1 }], "result": "Our tobacco clients appreciate the hustle. Print and outdoor it is." },
+        { "label": "Drop tobacco and keep our hands clean", "effects": [{ "dropCategory": "tobacco" }, { "flag": "noTobacco" }, { "reputation": 3 }, { "loyaltyCategory": "banking", "amount": 1 }, { "loyaltyCategory": "cosmetics", "amount": 1 }], "result": "We'll never work for a cigarette company again. The banks noticed." }
+      ]
+    },
+    {
+      "id": "hilltop_jingle",
+      "title": "The Hilltop Jingle",
+      "text": "A rival agency just put two hundred kids on a hilltop, singing about a soft drink. The whole country is humming it. Every client on Madison Avenue wants a song now.",
+      "trigger": { "date": [1971, 7] },
+      "options": [
+        { "label": "Ride the trend", "effects": [{ "mod": { "kind": "approach", "id": "jingle", "mult": 1.15, "weeks": 48 } }], "result": "Jingles will land harder for the next year." },
+        { "label": "Zig when they zag", "effects": [{ "knowledge": 4 }], "result": "The team studies what everyone else is missing." }
+      ]
+    },
+    {
+      "id": "pong",
+      "title": "Pong!",
+      "text": "A little company in California called Atarii has put a game in a bar. Two paddles, one dot, and a line of people waiting to play it. Strange times.",
+      "trigger": { "date": [1972, 11] },
+      "options": [
+        { "label": "Ping pong on a TV? Huh.", "effects": [], "result": "Atarii is now out there, looking for an agency." }
+      ]
+    },
+    {
+      "id": "oil_shock",
+      "title": "The Oil Shock",
+      "text": "The oil embargo has hit. Gas stations are running dry and the big car makers, airlines and oil companies are cutting their ad budgets. The small-car people are suddenly very popular.",
+      "trigger": { "date": [1973, 10] },
+      "effects": [{ "mod": { "kind": "budget", "categories": ["oil", "airline", "automobile"], "mult": 0.8, "weeks": 48 } }],
+      "options": [
+        { "label": "Sell thrift: pitch the economy cars", "effects": [{ "forceRfp": "automobile" }, { "reputation": 1 }], "result": "An automaker opens a pitch for a fuel-saving campaign." },
+        { "label": "Stand by Big Oil", "effects": [{ "loyaltyCategory": "oil", "amount": 1.5 }, { "loyaltyCategory": "automobile", "amount": -1 }, { "loyaltyCategory": "airline", "amount": -1 }], "result": "The oil men won't forget it. The carmakers might not either." }
+      ]
+    },
+    {
+      "id": "recession_75",
+      "title": "Belt Tightening",
+      "text": "The economy is in a slump. Every client is trimming its ad budget by ten percent for the year. The bank manager is suddenly very interested in our books.",
+      "trigger": { "date": [1975, 2] },
+      "effects": [{ "mod": { "kind": "budget", "mult": 0.9, "weeks": 48 } }],
+      "options": [
+        { "label": "Cut salaries by ten percent", "effects": [{ "salary": 0.9 }, { "mod": { "kind": "speed", "mult": 0.9, "weeks": 24 } }], "result": "Payroll is lighter. So is the mood in the office." },
+        { "label": "Take a bank loan", "effects": [{ "loan": 15000 }], "result": "The loan is in the account. Monthly repayments start next month." },
+        { "label": "Ride it out", "effects": [], "result": "We keep calm and carry on." }
+      ]
+    },
+    {
+      "id": "bicentennial",
+      "title": "Spirit of '76",
+      "text": "America turns two hundred this year. Every client wants red, white and blue on everything. You can hardly see the product for the flags.",
+      "trigger": { "date": [1976, 1] },
+      "options": [
+        { "label": "Wave the flag", "effects": [{ "mod": { "kind": "approach", "id": "emotional", "mult": 1.15, "weeks": 48 } }], "result": "Emotional campaigns will land harder this year." },
+        { "label": "Be the joke in a room full of flags", "effects": [{ "mod": { "kind": "approach", "id": "humor", "mult": 1.15, "weeks": 48 } }], "result": "Humor will stand out this year." }
+      ]
+    },
+    {
+      "id": "garage_guys",
+      "title": "Two Guys in a Garage",
+      "text": "Two long-haired kids from Apricot Computer want a campaign for their home computer. They can't pay much, but they're offering a slice of the company instead.",
+      "trigger": { "date": [1977, 4], "clientNotAccount": "Apricot Computer" },
+      "options": [
+        { "label": "Take the shares", "effects": [{ "flag": "apricotStake" }, { "cash": -1500 }, { "knowledge": 3 }], "result": "We now own a little piece of a computer company. Probably worthless." },
+        { "label": "Cash only, boys", "effects": [{ "cash": 2000 }, { "reputation": 0.5 }], "result": "They scraped the money together. Nice kids." },
+        { "label": "Show them the door", "effects": [], "result": "Computers in the home? Never going to happen." }
+      ]
+    },
+    {
+      "id": "galaxy",
+      "title": "A Galaxy Far Away",
+      "text": "A space movie has taken the country by storm and every kid wants the toys. The toy makers are doubling their budgets and looking for agencies that can keep up.",
+      "trigger": { "date": [1977, 6] },
+      "effects": [{ "mod": { "kind": "budget", "categories": ["toys"], "mult": 1.5, "weeks": 96 } }, { "forceRfp": "toys" }],
+      "options": [
+        { "label": "May the sales be with us", "effects": [], "result": "Toy budgets are up for the next two years." }
+      ]
+    },
+    {
+      "id": "deregulation",
+      "title": "Deregulation Takes Off",
+      "text": "Washington has deregulated the airlines. New routes, new fares, new upstarts. Every airline is suddenly fighting for its life and shopping for a new agency.",
+      "trigger": { "date": [1978, 10] },
+      "effects": [{ "mod": { "kind": "rfp", "categories": ["airline"], "mult": 2.5, "weeks": 96 } }, { "loyaltyCategory": "airline", "amount": -1 }],
+      "options": [
+        { "label": "Buckle up", "effects": [], "result": "Expect more airline pitches, and less airline loyalty." }
+      ]
+    },
+    {
+      "id": "gas_lines",
+      "title": "Gas Lines Again",
+      "text": "A second oil crisis. The lines at the pumps are back, odd and even days and all. Car, airline and oil budgets shrink again.",
+      "trigger": { "date": [1979, 6] },
+      "effects": [{ "mod": { "kind": "budget", "categories": ["oil", "airline", "automobile"], "mult": 0.9, "weeks": 48 } }],
+      "options": [
+        { "label": "Sell thrift again", "effects": [{ "forceRfp": "automobile" }], "result": "An automaker opens a pitch." },
+        { "label": "Stand by Big Oil", "effects": [{ "loyaltyCategory": "oil", "amount": 1 }], "result": "The oil men appreciate a friend." }
+      ]
+    },
+    {
+      "id": "apricot_ipo",
+      "title": "Apricot Goes Public",
+      "text": "Remember those two kids from the garage? Apricot Computer just went public, and our little slice of the company is worth a fortune.",
+      "trigger": { "date": [1980, 12], "flag": "apricotStake" },
+      "options": [
+        { "label": "Sell the shares", "effects": [{ "cash": 60000 }], "result": "The champagne is on the agency tonight." },
+        { "label": "Hold. They'll be worth more one day.", "effects": [{ "reputation": 4 }, { "flag": "apricotHold" }], "result": "The trade press calls us visionaries." }
+      ]
+    },
+    {
+      "id": "music_tv",
+      "title": "Video Killed the Radio Star",
+      "text": "A new cable channel plays nothing but music videos, all day long. The kids can't look away. The eighties are here.",
+      "trigger": { "date": [1981, 8] },
+      "options": [
+        { "label": "Turn it up", "effects": [{ "knowledge": 3 }], "result": "The team is already sketching ideas for the new decade." }
+      ]
+    },
+    {
+      "id": "dinner_bank",
+      "title": "Dinner at the Oak Room",
+      "text": "The chairman of {client} invites you to dinner at the Oak Room. Dark wood, white tablecloths, and a man who has never once smiled in a meeting.",
+      "trigger": { "category": "banking", "weight": 3, "cooldownWeeks": 48 },
+      "options": [
+        { "label": "Order the steak and a martini", "effects": [{ "cash": -150 }, { "chance": 0.6, "win": [{ "loyalty": 1.5 }], "lose": [{ "loyalty": -0.5 }], "winText": "He orders the same. By dessert you're old friends.", "loseText": "He drinks club soda. The evening never recovers." }] },
+        { "label": "Walk him through the campaign plan", "effects": [{ "chance": 0.5, "win": [{ "loyalty": 1 }, { "knowledge": 1 }], "lose": [{ "loyalty": -1 }], "winText": "He loves the numbers. He asks for a copy.", "loseText": "He checks his watch twice. Shop talk at dinner was a mistake." }] },
+        { "label": "Let him do the talking", "effects": [{ "loyalty": 0.8 }], "result": "Three hours on golf and the gold standard. He calls it a wonderful evening." }
+      ]
+    },
+    {
+      "id": "martini_lunch",
+      "title": "Three-Martini Lunch",
+      "text": "The marketing chief of {client} likes his lunches long and his martinis dry. It's one o'clock and he's ordering the second round.",
+      "trigger": { "category": "tobacco", "weight": 3, "cooldownWeeks": 36 },
+      "options": [
+        { "label": "Keep up with him", "effects": [{ "loyalty": 1.5 }, { "mod": { "kind": "speed", "mult": 0.75, "weeks": 1 } }], "result": "He calls you a real ad man. You don't remember the afternoon." },
+        { "label": "Switch to coffee", "effects": [{ "loyalty": -0.3 }], "result": "He raises an eyebrow, but signs the check." }
+      ]
+    },
+    {
+      "id": "studio_55",
+      "title": "A Night at Studio 55",
+      "text": "{client} is throwing a party at the hottest club in town, and you're on the list. Velvet ropes, mirror balls, and a doorman who decides your fate.",
+      "trigger": { "category": "cosmetics", "minYear": 1977, "weight": 3, "cooldownWeeks": 48 },
+      "options": [
+        { "label": "Put on your dancing shoes", "effects": [{ "cash": -400 }, { "loyalty": 1.5 }], "result": "You dance until four. The client is thrilled." },
+        { "label": "Politely decline", "effects": [{ "loyalty": -0.5 }], "result": "Someone from another agency took your spot on the list." }
+      ]
+    },
+    {
+      "id": "nephew",
+      "title": "The Nephew",
+      "text": "The president of {client} has a favor to ask. His nephew just graduated and needs a job. \"He's a creative type,\" he says. \"Mostly.\"",
+      "trigger": { "anyAccount": true, "weight": 2, "cooldownWeeks": 60 },
+      "options": [
+        { "label": "Find the boy a desk", "effects": [{ "hireNephew": true }, { "loyalty": 1 }], "result": "The nephew starts Monday." },
+        { "label": "We're not hiring right now", "effects": [{ "loyalty": -1 }], "result": "The president takes it well. Mostly." }
+      ]
+    },
+    {
+      "id": "account_review",
+      "title": "Account Under Review",
+      "text": "{client} isn't happy with how this year went. Their lawyers are reading the contract, and other agencies are already calling them.",
+      "trigger": { "system": true },
+      "options": [
+        { "label": "Take them to dinner", "effects": [{ "cash": -200 }, { "chance": "loyalty", "win": [{ "keepAccount": true }], "lose": [{ "loseAccount": true }], "winText": "Over brandy, they agree to give us one more year.", "loseText": "Dinner was lovely. They're leaving anyway." }] },
+        { "label": "Offer a free extra campaign", "effects": [{ "keepAccount": true }, { "freeCampaign": true }], "result": "They'll stay, and they expect one more campaign this year at our expense." },
+        { "label": "Let them go", "effects": [{ "loseAccount": true }], "result": "We part ways, politely." }
+      ]
+    },
+    {
+      "id": "poached",
+      "title": "Poached",
+      "text": "Sterling Crane has offered {staff} a corner office and a bigger salary. They want to know if we'll match it.",
+      "trigger": { "minStaff": 2, "weight": 2, "cooldownWeeks": 60 },
+      "options": [
+        { "label": "Match the offer", "effects": [{ "bestStaffRaise": 0.25 }], "result": "{staff} stays, at a price." },
+        { "label": "Wish them luck", "effects": [{ "bestStaffLeaves": true }], "result": "{staff} packs up their desk." }
+      ]
+    },
+    {
+      "id": "creative_block",
+      "title": "Creative Block",
+      "text": "The team is stuck. Nobody has had a good idea in weeks, and the wastebasket is full of crumpled paper.",
+      "trigger": { "minResults": 3, "weight": 2, "cooldownWeeks": 36 },
+      "options": [
+        { "label": "Everybody to the bar, on the agency", "effects": [{ "cash": -300 }, { "mod": { "kind": "quality", "mult": 1.1, "weeks": 8 } }], "result": "Somebody had a great idea on a napkin around midnight." },
+        { "label": "Push through it", "effects": [{ "mod": { "kind": "speed", "mult": 0.9, "weeks": 4 } }], "result": "The team grinds on, a little slower." }
+      ]
+    },
+    {
+      "id": "leaked_deck",
+      "title": "The Leaked Deck",
+      "text": "A courier has delivered the wrong envelope. Inside is the full pitch a rival agency is preparing for {client}.",
+      "trigger": { "rfpOpen": true, "weight": 3, "cooldownWeeks": 96 },
+      "options": [
+        { "label": "Take a quick look", "effects": [{ "chance": 0.75, "win": [{ "pitchBonus": 1.5 }], "lose": [{ "reputation": -8 }], "winText": "Nobody will ever know. Our pitch just got sharper.", "loseText": "The courier talked. The trade press is calling us cheats." }] },
+        { "label": "Send it back unopened", "effects": [{ "reputation": 2 }], "result": "The rival agency sends a thank-you note. Word gets around." }
+      ]
+    },
+    {
+      "id": "clio_call",
+      "title": "The Clio Call",
+      "text": "Our work for {client} could be nominated for advertising's biggest award. The entry fee isn't cheap, and there's no guarantee.",
+      "trigger": { "goodResult": true, "weight": 2, "cooldownWeeks": 48 },
+      "options": [
+        { "label": "Pay the entry fee", "effects": [{ "cash": -800 }, { "chance": 0.4, "win": [{ "reputation": 6 }, { "knowledge": 3 }], "lose": [], "winText": "We won! The statue goes on the reception desk.", "loseText": "We lost to a soap commercial. Next year." }] },
+        { "label": "Save the money", "effects": [], "result": "Awards are for agencies with time to spare." }
+      ]
+    }
+  ]
+}

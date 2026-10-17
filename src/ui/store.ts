@@ -3,7 +3,7 @@ import { isBlocked, newGame, tick, type NewGameOptions } from "../sim/game";
 import type { GameState } from "../sim/types";
 import type { DayOutput } from "../sim/campaign";
 
-const SAVE_KEY = "mad-avenue-save-v2";
+const SAVE_KEY = "mad-avenue-save-v3";
 // Roughly 4.5 real seconds per in-game week while the team works; dialogs pause the clock.
 const BASE_MS_PER_DAY = 4500 / 7;
 
@@ -121,7 +121,7 @@ class GameStore {
       const raw = localStorage.getItem(SAVE_KEY);
       if (!raw) return null;
       const s = JSON.parse(raw) as GameState;
-      return s.version === 2 ? s : null;
+      return s.version === 3 ? s : null;
     } catch {
       return null;
     }

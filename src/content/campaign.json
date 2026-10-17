@@ -6,11 +6,11 @@
     },
     {
       "id": "beer",
-      "name": "Beer"
+      "name": "Beer & Spirits"
     },
     {
       "id": "detergent",
-      "name": "Detergent"
+      "name": "Household"
     },
     {
       "id": "automobile",
@@ -31,6 +31,22 @@
     {
       "id": "banking",
       "name": "Banking"
+    },
+    {
+      "id": "tobacco",
+      "name": "Tobacco"
+    },
+    {
+      "id": "airline",
+      "name": "Airlines"
+    },
+    {
+      "id": "tech",
+      "name": "Tech & Electronics"
+    },
+    {
+      "id": "oil",
+      "name": "Oil & Gas"
     }
   ],
   "approaches": [
@@ -403,6 +419,42 @@
         "comparative": "good",
         "lifestyle": "ok",
         "shock": "bad"
+      },
+      "tobacco": {
+        "humor": "ok",
+        "emotional": "good",
+        "jingle": "good",
+        "testimonial": "great",
+        "comparative": "ok",
+        "lifestyle": "great",
+        "shock": "bad"
+      },
+      "airline": {
+        "humor": "good",
+        "emotional": "great",
+        "jingle": "good",
+        "testimonial": "ok",
+        "comparative": "ok",
+        "lifestyle": "great",
+        "shock": "bad"
+      },
+      "tech": {
+        "humor": "ok",
+        "emotional": "good",
+        "jingle": "bad",
+        "testimonial": "good",
+        "comparative": "great",
+        "lifestyle": "good",
+        "shock": "ok"
+      },
+      "oil": {
+        "humor": "good",
+        "emotional": "ok",
+        "jingle": "great",
+        "testimonial": "good",
+        "comparative": "ok",
+        "lifestyle": "bad",
+        "shock": "bad"
       }
     },
     "approachChannel": {
@@ -504,6 +556,30 @@
         "families": "good",
         "adults": "great",
         "women": "good"
+      },
+      "tobacco": {
+        "youth": "ok",
+        "families": "bad",
+        "adults": "great",
+        "women": "good"
+      },
+      "airline": {
+        "youth": "bad",
+        "families": "good",
+        "adults": "great",
+        "women": "ok"
+      },
+      "tech": {
+        "youth": "good",
+        "families": "ok",
+        "adults": "great",
+        "women": "bad"
+      },
+      "oil": {
+        "youth": "bad",
+        "families": "good",
+        "adults": "great",
+        "women": "ok"
       }
     },
     "channelAudience": {

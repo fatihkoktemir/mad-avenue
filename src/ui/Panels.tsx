@@ -148,6 +148,11 @@ export function HandbookPanel({ state, onClose }: { state: GameState; onClose: (
         <p>3. Each of the three stages has three areas. Spend time where the approach and channel need it. Music is wasted on print; art is wasted on radio.</p>
         <p>4. Orange bubbles are creativity, blue are strategy, red are client notes. Clear notes in revision before you deliver.</p>
         <p>5. Three executives score the work: the CEO wants a big idea and progress, the Marketing Director wants the right work, the Finance Director wants value, deadlines and no loose ends.</p>
+        <p><b>ACCOUNTS AND PITCHES</b></p>
+        <p>Small companies send trial briefs. Make them happy and they sign a yearly contract, which also opens their sector.</p>
+        <p>Clients on contract pay a monthly billing and expect a number of campaigns a year. Start those from the Accounts screen. At the anniversary they look back: good work raises billing, missed or weak campaigns lose the account.</p>
+        <p>Medium and large clients in your sectors invite you to pitch. The pitch is the Strategy stage of a normal campaign; beat the rival agencies and the campaign carries on as their first job.</p>
+        <p>Budget is always visible. Loyalty and Pickiness show once you've worked with a client.</p>
       </div>
       <h3>Discovered matches</h3>
       {entries.length === 0 && <p className="muted">Nothing yet. Every campaign teaches you something.</p>}

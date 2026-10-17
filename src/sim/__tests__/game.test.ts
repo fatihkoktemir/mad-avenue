@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
-  availableExtras, chooseExtras, deliver, dismissResult, hire, isBlocked, newGame,
-  research, revise, setAllocation, startCampaign, takeSmallJob, tick, upgradeOffice,
+  acceptPitch, availableExtras, channelBlocked, chooseEvent, chooseExtras, deliver, dismissPitch,
+  dismissResult, hire, isBlocked, newGame, requestCampaign, research, revise, setAllocation,
+  startCampaign, takeSmallJob, tick, upgradeOffice,
 } from "../game";
+import { canRequestCampaign } from "../accounts";
 import { idealShares } from "../campaign";
 import { RESEARCH, SLOGANS } from "../content";
 import { Rng } from "../rng";
@@ -11,16 +13,30 @@ import type { GameState } from "../types";
 /** A simple bot that plays the way a decent player would. */
 function playBot(s: GameState, rng: Rng, skill: "good" | "random"): void {
   if (s.pendingResult !== null) dismissResult(s);
+  if (s.event) chooseEvent(s, skill === "good" ? 0 : rng.int(0, 1));
+  if (s.pitch) dismissPitch(s);
   const p = s.project;
   if (!p) {
     for (const r of RESEARCH) if (s.cash - r.cost > 8000) research(s, r.id);
     if (s.office === 0 && s.cash > 45000) upgradeOffice(s);
     const cap = s.unlocks.scales.includes("regional") ? 4 : 2;
     if (s.candidates.length && s.staff.length < cap && s.cash > 6000) hire(s, 0);
-    const brief = s.briefs[0];
+    // Pitches first, then the campaigns our accounts pay for, then trial briefs.
+    let briefId: number | null = null;
+    if (s.rfp && !s.rfp.accepted) {
+      const id = acceptPitch(s);
+      if (typeof id === "number") briefId = id;
+    }
+    for (const acc of s.accounts) {
+      if (briefId === null && !canRequestCampaign(s, acc.client.name)) {
+        const id = requestCampaign(s, acc.client.name);
+        if (typeof id === "number") briefId = id;
+      }
+    }
+    const brief = s.briefs.find((b) => b.id === briefId) ?? s.briefs.find((b) => b.kind !== "trial") ?? s.briefs[0];
     if (brief) {
       const approaches = s.unlocks.approaches;
-      const channels = s.unlocks.channels.filter((c) => c !== "tv" || brief.scale !== "local");
+      const channels = s.unlocks.channels.filter((c) => (c !== "tv" || brief.scale !== "local") && !channelBlocked(s, brief, c));
       const approach = skill === "good" ? approaches[0] : rng.pick(approaches);
       const slogan = SLOGANS[brief.client.category].find((x) => x.tag === approach) ?? SLOGANS[brief.client.category][0];
       const err = startCampaign(s, brief.id, {

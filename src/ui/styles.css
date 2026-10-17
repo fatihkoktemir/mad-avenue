@@ -265,3 +265,27 @@ table.simple th { font-size: 12px; text-transform: uppercase; color: var(--ink-s
 .title-card .sub { font-family: var(--display); color: var(--wood); font-size: 18px; margin-bottom: 18px; font-weight: 600; }
 .title-card label { display: flex; flex-direction: column; gap: 4px; font-weight: 800; font-size: 13px; }
 .error { color: var(--bad); font-weight: 800; font-size: 13px; }
+
+/* ---------- Accounts, pitches and events ---------- */
+button.pill { border-radius: 22px; height: 44px; padding: 0 18px; }
+button.pill.alert { background: linear-gradient(#f39a4a, var(--orange)); color: #fff; animation: pulse 1.4s ease-in-out infinite; }
+@keyframes pulse { 50% { transform: scale(1.05); } }
+.tag { display: inline-block; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 7px; border-radius: 6px; background: var(--line); color: var(--ink-soft); }
+.tag.account { background: var(--teal); color: #fff; }
+.tag.rfp { background: var(--orange); color: #fff; }
+.sectors { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; max-height: 60vh; overflow-y: auto; padding-right: 4px; }
+.sector { background: var(--panel-2); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+.sector h3 { margin: 0 0 2px; font-family: var(--display); font-size: 16px; }
+.sector.locked { opacity: 0.7; }
+.company { background: #fff; border-radius: 8px; padding: 6px 8px; display: flex; flex-direction: column; gap: 3px; }
+.company.client { box-shadow: inset 4px 0 0 var(--teal); }
+.stars-row { display: flex; gap: 10px; color: var(--ink-soft); }
+.stack-tight { display: flex; flex-direction: column; gap: 3px; }
+button.small-btn { padding: 4px 10px; font-size: 13px; align-self: flex-start; }
+.card.rfp { background: #fde3c8; box-shadow: inset 0 0 0 2px var(--orange); margin-bottom: 12px; }
+.rival { margin-right: 14px; }
+.pitchrow .bar { height: 10px; background: var(--panel-2); border-radius: 5px; overflow: hidden; margin-top: 3px; }
+.pitchrow .bar div { height: 100%; border-radius: 5px; }
+.event p { line-height: 1.5; }
+.event button { text-align: left; }
+@media (prefers-reduced-motion: reduce) { button.pill.alert { animation: none; } }
