@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { CATEGORIES, CLIENTS, eventDef, nameOf } from "../sim/content";
+import { AGENCY_TIERS, CATEGORIES, CLIENTS, eventDef, nameOf } from "../sim/content";
 import { dateOf, formatDate } from "../sim/calendar";
-import { LARGE_RFP_REPUTATION, accountOf, canRequestCampaign, renewThreshold, yearScore } from "../sim/accounts";
+import { SIZE_TIER, accountOf, agencyTier, canRequestCampaign, conflicts, renewThreshold, tierChecks, yearScore } from "../sim/accounts";
 import { eventText } from "../sim/events";
 import { acceptPitch, chooseEvent, declinePitch, dismissPitch, requestCampaign } from "../sim/game";
 import type { Brief, GameState, Rfp } from "../sim/types";
@@ -23,6 +23,7 @@ export function AccountsPanel({ state, onClose }: { state: GameState; onClose: (
   };
   const yearly = state.accounts.reduce((a, x) => a + x.billing, 0);
   const year = dateOf(state.day).year;
+  const tier = agencyTier(state);
 
   return (
     <Modal title="Accounts" onClose={onClose} wide>
@@ -30,6 +31,7 @@ export function AccountsPanel({ state, onClose }: { state: GameState; onClose: (
         {state.accounts.length} client{state.accounts.length === 1 ? "" : "s"} on contract, billing {money(yearly)} a year.
         Win a small client in a sector to open it; bigger clients there will then invite you to pitch.
       </p>
+      <TierCard state={state} tier={tier} />
       {state.rfp && <RfpCard state={state} rfp={state.rfp} onPitch={() => open(state.rfp?.accepted ? state.briefs.find((b) => b.kind === "rfp")?.id : store.act(acceptPitch))} />}
       {error && <p className="error">{error}</p>}
       <div className="sectors">
@@ -75,7 +77,7 @@ export function AccountsPanel({ state, onClose }: { state: GameState; onClose: (
                       </div>
                     ) : (
                       <div className="small muted">
-                        {notYet ? `Founded later` : banned ? "We don't work for tobacco." : state.lostClients.includes(c.name) ? "Former client" : c.size === "small" ? "Sends trial briefs" : "Pitch only"}
+                        {notYet ? `Founded later` : banned ? "We don't work for tobacco." : state.lostClients.includes(c.name) ? "Former client" : c.size === "small" ? "Sends trial briefs" : tier < SIZE_TIER[c.size] ? `Pitch only, for a ${AGENCY_TIERS[SIZE_TIER[c.size]].name}` : "Pitch only"}
                       </div>
                     )}
                   </div>
@@ -86,15 +88,39 @@ export function AccountsPanel({ state, onClose }: { state: GameState; onClose: (
         })}
       </div>
       <p className="small muted" style={{ marginTop: 12 }}>
-        Large clients only invite agencies with ★ {LARGE_RFP_REPUTATION} reputation and a real office. Medium and large clients need Regional Campaigns research.
+        We can't serve two rivals: winning a pitch in a sector means dropping the clients we already have there.
       </p>
     </Modal>
+  );
+}
+
+function TierCard({ state, tier }: { state: GameState; tier: number }) {
+  const next = AGENCY_TIERS[tier + 1];
+  return (
+    <div className="card tier">
+      <div className="spread">
+        <div>
+          <span className="small muted">Our standing</span>
+          <h3>{AGENCY_TIERS[tier].name}</h3>
+        </div>
+        <div className="small muted">{tier === 0 ? "Small clients only" : tier === 1 ? "Small and medium clients" : "Every client in America"}</div>
+      </div>
+      {next && (
+        <div className="small">
+          To become a <b>{next.name}</b>:
+          <ul className="checks">
+            {tierChecks(state, tier + 1).map((c) => <li key={c.label} className={c.ok ? "ok" : ""}>{c.ok ? "✓" : "○"} {c.label}</li>)}
+          </ul>
+        </div>
+      )}
+    </div>
   );
 }
 
 function RfpCard({ state, rfp, onPitch }: { state: GameState; rfp: Rfp; onPitch: () => void }) {
   const c = rfp.client;
   const known = state.known.includes(c.name);
+  const rivalsHere = conflicts(state, c).map((a) => a.client.name);
   return (
     <div className="card rfp stack">
       <div className="spread">
@@ -112,6 +138,11 @@ function RfpCard({ state, rfp, onPitch }: { state: GameState; rfp: Rfp; onPitch:
       <div className="small">
         Contract: <b>{money(rfp.billing)}</b> a year for {rfp.expected} campaign{rfp.expected > 1 ? "s" : ""}. You pitch with the Strategy stage of a normal campaign; if you win, the campaign carries on as their first job.
       </div>
+      {rivalsHere.length > 0 && (
+        <div className="small conflict">
+          ⚠ {rivalsHere.join(" and ")} {rivalsHere.length > 1 ? "are" : "is"} our client. If they hear about this pitch they'll leave, and if we win we have to drop them.
+        </div>
+      )}
       <div className="small">
         Competing: {rfp.rivals.map((r) => <span key={r.name} className="rival">{r.name} <b>{r.strength.toFixed(1)}</b></span>)}
       </div>
@@ -146,7 +177,7 @@ export function PitchModal({ state }: { state: GameState }) {
   );
 }
 
-export function EventModal({ state }: { state: GameState }) {
+export function EventModal({ state, onOpen }: { state: GameState; onOpen: (panel: string) => void }) {
   const active = state.event;
   if (!active) return null;
   const ev = eventDef(active.id);
@@ -157,7 +188,7 @@ export function EventModal({ state }: { state: GameState }) {
         <p>{eventText(state, ev.text, active.target)}</p>
         <div className="stack">
           {ev.options.map((o, i) => (
-            <button key={i} className={i === 0 ? "primary" : "secondary"} onClick={() => store.act((s) => chooseEvent(s, i))}>
+            <button key={i} className={i === 0 ? "primary" : "secondary"} onClick={() => { store.act((s) => chooseEvent(s, i)); if (o.open) onOpen(o.open); }}>
               {eventText(state, o.label, active.target)}
             </button>
           ))}

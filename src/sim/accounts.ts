@@ -1,4 +1,4 @@
-import { AUDIENCES, CLIENTS, HINTS, RIVALS, scale, type Objective } from "./content";
+import { AGENCY_TIERS, AUDIENCES, CLIENTS, HINTS, RIVALS, scale, type Objective } from "./content";
 import { DAYS_PER_WEEK, DAYS_PER_YEAR, dateOf, inflation } from "./calendar";
 import type { Rng } from "./rng";
 import type { Account, Brief, Client, ClientSize, GameState, Rfp } from "./types";
@@ -7,8 +7,56 @@ import { modMult, money, nextId, notify } from "./util";
 /** Billing per expected campaign, in 1970 dollars. */
 const BILLING_PER_CAMPAIGN: Record<ClientSize, number> = { small: 1200, medium: 4500, large: 6000 };
 const SIZE_SCALE: Record<ClientSize, string> = { small: "local", medium: "regional", large: "regional" };
-/** Reputation and office needed before a large client will invite us to pitch. */
-export const LARGE_RFP_REPUTATION = 20;
+/** The agency tier a client of each size wants to see before it invites us to pitch. */
+export const SIZE_TIER: Record<ClientSize, number> = { small: 0, medium: 1, large: 2 };
+/** Chance, each week a conflicting pitch is in progress, that our current client hears about it. */
+const LEAK_CHANCE = 0.1;
+
+// ---------- Agency tier ----------
+
+export function tierChecks(s: GameState, tier: number): { label: string; ok: boolean }[] {
+  const t = AGENCY_TIERS[tier];
+  const out: { label: string; ok: boolean }[] = [];
+  if (t.office) out.push({ label: "A real office", ok: s.office >= t.office });
+  if (t.reputation) out.push({ label: `★ ${t.reputation} reputation (now ${Math.floor(s.reputation)})`, ok: s.reputation >= t.reputation });
+  if (t.scale) out.push({ label: "Regional Campaigns research", ok: s.unlocks.scales.includes(t.scale) });
+  if (t.staff) out.push({ label: `${t.staff} people on staff (now ${s.staff.length})`, ok: s.staff.length >= t.staff });
+  if (t.renewedMedium) out.push({ label: "Renewed a medium or large client once", ok: s.flags.includes("renewedMedium") });
+  return out;
+}
+
+/** The highest tier whose conditions (and every lower tier's) we meet right now. */
+export function agencyTier(s: GameState): number {
+  let tier = 0;
+  while (tier + 1 < AGENCY_TIERS.length && tierChecks(s, tier + 1).every((c) => c.ok)) tier++;
+  return tier;
+}
+
+/** Weekly: celebrate the first time we reach each tier. */
+export function checkTier(s: GameState, queue: (id: string) => void): void {
+  const tier = agencyTier(s);
+  for (let t = 1; t <= tier; t++) {
+    if (s.flags.includes(`tier${t}`)) continue;
+    s.flags.push(`tier${t}`);
+    queue(`tier_${t}`);
+  }
+}
+
+/** Our accounts that compete with a client: same sector. */
+export function conflicts(s: GameState, c: Client): Account[] {
+  return s.accounts.filter((a) => a.client.category === c.category && a.client.name !== c.name);
+}
+
+/** Things on the Accounts page waiting for the player: an unanswered pitch, accounts behind on campaigns. */
+export function accountAlerts(s: GameState): number {
+  let n = s.rfp && !s.rfp.accepted ? 1 : 0;
+  for (const acc of s.accounts) {
+    const busy = s.briefs.some((b) => b.client.name === acc.client.name)
+      || (s.project?.kind === "campaign" && s.project.brief.client.name === acc.client.name);
+    if (!busy && acc.done < acc.expected + acc.free && acc.renewDay - s.day <= 8 * DAYS_PER_WEEK) n++;
+  }
+  return n;
+}
 
 export function clientAvailable(s: GameState, c: Client): boolean {
   if (c.fromYear && dateOf(s.day).year < c.fromYear) return false;
@@ -67,7 +115,8 @@ export function renewThreshold(acc: Account): number {
   return 7.5 - acc.client.loyalty;
 }
 
-export function renewAccount(acc: Account, raise: number): void {
+export function renewAccount(s: GameState, acc: Account, raise: number): void {
+  if (acc.client.size !== "small" && !s.flags.includes("renewedMedium")) s.flags.push("renewedMedium");
   acc.billing = Math.round((acc.billing * raise) / 50) * 50;
   acc.done = 0;
   acc.free = 0;
@@ -86,7 +135,7 @@ export function checkRenewals(s: GameState, queueReview: (name: string) => void)
     const need = renewThreshold(acc);
     if (score >= need) {
       const raise = score >= 8 ? 1.12 : score >= need + 1 ? 1.05 : 1;
-      renewAccount(acc, raise);
+      renewAccount(s, acc, raise);
       notify(s, `${acc.client.name} renewed for another year${raise > 1 ? `, and raised billing to ${money(acc.billing)}` : ""}.`, "good");
     } else if (score >= need - 1.5) {
       acc.renewDay = s.day + 4 * DAYS_PER_WEEK; // decided by the review event
@@ -137,7 +186,8 @@ function briefFor(s: GameState, rng: Rng, c: Client, kind: Brief["kind"], fee: n
 /** A one-off brief from a small company that isn't a client yet. Do it well and they sign. */
 export function makeTrialBrief(s: GameState, rng: Rng): Brief | null {
   const taken = new Set([...s.accounts.map((a) => a.client.name), ...s.briefs.map((b) => b.client.name), ...s.lostClients]);
-  const pool = CLIENTS.filter((c) => c.size === "small" && clientAvailable(s, c) && !taken.has(c.name));
+  // Small clients don't ask for trial work from an agency that already serves a rival.
+  const pool = CLIENTS.filter((c) => c.size === "small" && clientAvailable(s, c) && !taken.has(c.name) && !conflicts(s, c).length);
   if (!pool.length) return null;
   const c = rng.pick(pool);
   const repBoost = 1 + Math.min(0.5, s.reputation / 60);
@@ -182,7 +232,7 @@ export function rfpPool(s: GameState, category?: string): Client[] {
   return CLIENTS.filter((c) => {
     if (c.size === "small" || !clientAvailable(s, c) || accountOf(s, c.name)) return false;
     if (category ? c.category !== category : !s.sectors.includes(c.category)) return false;
-    if (c.size === "large" && (s.reputation < LARGE_RFP_REPUTATION || s.office < 1)) return false;
+    if (agencyTier(s) < SIZE_TIER[c.size]) return false;
     return true;
   });
 }
@@ -200,7 +250,8 @@ export function openRfp(s: GameState, rng: Rng, c: Client): Rfp {
     pitchBonus: 0,
   };
   s.rfp = rfp;
-  notify(s, `${c.name} is looking for a new agency and invited us to pitch.`, "good");
+  s.eventLog.rfp_invite = s.day;
+  s.eventQueue.push({ id: "rfp_invite", target: c.name });
   return rfp;
 }
 
@@ -241,6 +292,18 @@ export function acceptRfp(s: GameState, rng: Rng): number | string {
   brief.expiresDay = rfp.expiresDay;
   s.briefs.push(brief);
   return brief.id;
+}
+
+/** Weekly: a client we already serve may hear we're pitching for its rival, and leave. */
+export function checkPitchLeak(s: GameState, rng: Rng, queue: (name: string) => void): void {
+  if (!s.rfp?.accepted || s.event?.id === "pitch_leak" || s.eventQueue.some((e) => e.id === "pitch_leak")) return;
+  const rivals = conflicts(s, s.rfp.client);
+  if (rivals.length && rng.chance(LEAK_CHANCE)) queue(rng.pick(rivals).client.name);
+}
+
+/** We won a pitch: accounts competing with the new client have to go. */
+export function dropConflicts(s: GameState, c: Client): void {
+  for (const acc of conflicts(s, c)) loseAccount(s, acc.client.name, `is no longer our client now that we work for ${c.name}`);
 }
 
 export function declineRfp(s: GameState): void {

@@ -10,7 +10,7 @@ import {
   type DayOutput,
 } from "./campaign";
 import {
-  acceptRfp, accountOf, checkRenewals, declineRfp, makeTrialBrief, maybeOpenRfp, monthlyBilling,
+  acceptRfp, accountOf, checkPitchLeak, checkRenewals, checkTier, dropConflicts, declineRfp, makeTrialBrief, maybeOpenRfp, monthlyBilling,
   requestAccountCampaign, signAccount,
 } from "./accounts";
 import { chooseEventOption, queueEvent, weeklyEvents } from "./events";
@@ -185,6 +185,8 @@ function weekly(s: GameState, rng: Rng): void {
   s.mods = s.mods.filter((m) => m.until > s.day);
 
   checkRenewals(s, (name) => queueEvent(s, "account_review", name));
+  checkPitchLeak(s, rng, (name) => queueEvent(s, "pitch_leak", name));
+  checkTier(s, (id) => queueEvent(s, id, null));
   weeklyEvents(s, rng);
 }
 
@@ -208,6 +210,7 @@ function resolvePitch(s: GameState, p: CampaignProject, rng: Rng): void {
   s.pitch = { clientName: p.brief.client.name, score: total, rivals, won, lines };
   s.knowledge += 2;
   if (won) {
+    dropConflicts(s, p.brief.client);
     signAccount(s, p.brief.client, rfp ? { billing: rfp.billing, expected: rfp.expected } : undefined);
   } else {
     notify(s, `We lost the ${p.brief.client.name} pitch to ${[...rivals].sort((a, b) => b.strength - a.strength)[0]?.name ?? "a rival"}.`, "bad");

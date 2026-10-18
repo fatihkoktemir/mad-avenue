@@ -1,4 +1,9 @@
 {
+  "agencyTiers": [
+    { "name": "Boutique" },
+    { "name": "Regional Shop", "reputation": 10, "office": 1, "scale": "regional" },
+    { "name": "Madison Avenue Agency", "reputation": 25, "office": 1, "scale": "regional", "staff": 4, "renewedMedium": true }
+  ],
   "clients": [
     {
       "name": "Lola Coca",

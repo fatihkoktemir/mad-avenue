@@ -268,6 +268,13 @@ table.simple th { font-size: 12px; text-transform: uppercase; color: var(--ink-s
 
 /* ---------- Accounts, pitches and events ---------- */
 button.pill { border-radius: 22px; height: 44px; padding: 0 18px; }
+button .badge { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; margin-left: 8px; border-radius: 6px; background: #d62828; color: #fff; font: 800 12px var(--body); vertical-align: 2px; }
+.card.tier h3 { margin: 0; }
+.card.tier { margin-bottom: 10px; }
+ul.checks { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 4px 16px; }
+ul.checks li { color: var(--ink-soft); }
+ul.checks li.ok { color: var(--teal); font-weight: 700; }
+.conflict { background: #fff3d6; border-radius: 8px; padding: 6px 10px; color: #8a4b00; }
 button.pill.alert { background: linear-gradient(#f39a4a, var(--orange)); color: #fff; animation: pulse 1.4s ease-in-out infinite; }
 @keyframes pulse { 50% { transform: scale(1.05); } }
 .tag { display: inline-block; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 7px; border-radius: 6px; background: var(--line); color: var(--ink-soft); }
@@ -288,4 +295,11 @@ button.small-btn { padding: 4px 10px; font-size: 13px; align-self: flex-start; }
 .pitchrow .bar div { height: 100%; border-radius: 5px; }
 .event p { line-height: 1.5; }
 .event button { text-align: left; }
-@media (prefers-reduced-motion: reduce) { button.pill.alert { animation: none; } }
+@media (prefers-reduced-motion: reduce) { button .badge { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; margin-left: 8px; border-radius: 6px; background: #d62828; color: #fff; font: 800 12px var(--body); vertical-align: 2px; }
+.card.tier h3 { margin: 0; }
+.card.tier { margin-bottom: 10px; }
+ul.checks { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 4px 16px; }
+ul.checks li { color: var(--ink-soft); }
+ul.checks li.ok { color: var(--teal); font-weight: 700; }
+.conflict { background: #fff3d6; border-radius: 8px; padding: 6px 10px; color: #8a4b00; }
+button.pill.alert { animation: none; } }

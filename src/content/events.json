@@ -166,6 +166,45 @@
       ]
     },
     {
+      "id": "rfp_invite",
+      "title": "An Invitation to Pitch",
+      "text": "A letter on heavy cream stock: {client} is reviewing its advertising and would like {agency} to pitch for the account.",
+      "trigger": { "system": true },
+      "options": [
+        { "label": "Let's take a look", "effects": [], "open": "accounts" },
+        { "label": "Later", "effects": [] }
+      ]
+    },
+    {
+      "id": "pitch_leak",
+      "title": "Word Gets Around",
+      "text": "{client} heard at the club that we're pitching for one of their rivals. Their marketing director called to say it's over.",
+      "trigger": { "system": true },
+      "effects": [{ "loseAccount": true }],
+      "options": [
+        { "label": "That's the business", "effects": [] }
+      ]
+    },
+    {
+      "id": "tier_1",
+      "title": "A Regional Shop",
+      "text": "The trade press has started calling {agency} \"one to watch\". Medium-sized clients are taking our calls now.",
+      "trigger": { "system": true },
+      "options": [
+        { "label": "Pop the champagne", "effects": [] }
+      ]
+    },
+    {
+      "id": "tier_2",
+      "title": "Madison Avenue",
+      "text": "{agency} made the Ad Age list of agencies that matter. The biggest names in the country will now invite us to pitch.",
+      "trigger": { "system": true },
+      "effects": [{ "reputation": 2 }],
+      "options": [
+        { "label": "Order a bigger sign", "effects": [] }
+      ]
+    },
+    {
       "id": "account_review",
       "title": "Account Under Review",
       "text": "{client} isn't happy with how this year went. Their lawyers are reading the contract, and other agencies are already calling them.",

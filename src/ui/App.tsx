@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { accountAlerts } from "../sim/accounts";
 import { STAGES, nameOf } from "../sim/content";
 import { dateOf, formatDate } from "../sim/calendar";
 import { SLICE_END_YEAR } from "../sim/game";
@@ -27,6 +28,7 @@ function Game({ state }: { state: GameState }) {
   }, [panel]);
   const result = state.pendingResult !== null ? state.results.find((r) => r.id === state.pendingResult) : undefined;
 
+  const alerts = accountAlerts(state);
   return (
     <div className="game">
       <div className="stage">
@@ -37,8 +39,8 @@ function Game({ state }: { state: GameState }) {
         </div>
         <div className="hud hud-right">
           <div className="row">
-            <button className={`pill${state.rfp && !state.rfp.accepted ? " alert" : ""}`} onClick={() => setPanel("accounts")}>
-              Accounts{state.rfp && !state.rfp.accepted ? " · Pitch!" : ""}
+            <button className="pill" onClick={() => setPanel("accounts")}>
+              Accounts{alerts > 0 && <span className="badge" aria-label={`${alerts} waiting`}>{alerts}</span>}
             </button>
             <button className="round" onClick={() => store.togglePause()} aria-label={store.paused ? "Resume" : "Pause"}>{store.paused ? "▶" : "❚❚"}</button>
             <button className="round" onClick={() => setPanel("handbook")} aria-label="Agency Handbook">?</button>
@@ -68,7 +70,7 @@ function Game({ state }: { state: GameState }) {
 
       {!panel && !state.event && !state.pitch && <CampaignDecision state={state} />}
       {!panel && !result && <PitchModal state={state} />}
-      {!panel && !result && !state.pitch && <EventModal state={state} />}
+      {!panel && !result && !state.pitch && <EventModal state={state} onOpen={(p) => setPanel(p as MenuAction)} />}
       {result && <ResultModal key={result.id} result={result} />}
       {state.over && <GameOver state={state} />}
     </div>
@@ -97,7 +99,7 @@ function BottomBar({ state, onMenu }: { state: GameState; onMenu: (a: MenuAction
       <footer className="bottombar">
         <span className="muted">The team is free. Click the office or pick something:</span>
         <button className="primary" onClick={() => onMenu("briefs")}>Briefs ({state.briefs.length})</button>
-        <button className="primary" onClick={() => onMenu("accounts")}>Accounts ({state.accounts.length})</button>
+        <button className="primary" onClick={() => onMenu("accounts")}>Accounts ({state.accounts.length}){accountAlerts(state) > 0 && <span className="badge">{accountAlerts(state)}</span>}</button>
         <button onClick={() => onMenu("smallJobs")}>Small Jobs ({state.smallJobs.length})</button>
         <button className="secondary" onClick={() => onMenu("research")}>Research</button>
         <button className="secondary" onClick={() => onMenu("staff")}>Staff</button>

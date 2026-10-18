@@ -83,7 +83,7 @@ export const HINTS = clients.hints as {
   risk: { low: string; high: string };
 };
 export type EventEffect = Record<string, unknown>;
-export interface EventOption { label: string; effects: EventEffect[]; result?: string }
+export interface EventOption { label: string; effects: EventEffect[]; result?: string; open?: string }
 export interface EventTrigger {
   date?: [number, number];
   system?: boolean;
@@ -146,3 +146,13 @@ export function nameOf(id: string): string {
   ];
   return all.find((x) => x.id === id)?.name ?? id;
 }
+
+export interface AgencyTier {
+  name: string;
+  reputation?: number;
+  office?: number;
+  scale?: string;
+  staff?: number;
+  renewedMedium?: boolean;
+}
+export const AGENCY_TIERS = clients.agencyTiers as AgencyTier[];

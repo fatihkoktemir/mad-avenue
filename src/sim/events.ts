@@ -151,7 +151,7 @@ function applyEffects(s: GameState, rng: Rng, effects: EventEffect[], target: st
     }
     if ("pitchBonus" in e && s.rfp) s.rfp.pitchBonus += num(e.pitchBonus);
     if ("keepAccount" in e && acc && acc.renewDay - s.day <= 4 * DAYS_PER_WEEK) {
-      renewAccount(acc, 1);
+      renewAccount(s, acc, 1);
       notify(s, `${acc.client.name} stays with us for another year.`, "good");
     }
     if ("freeCampaign" in e && acc) acc.free += 1;

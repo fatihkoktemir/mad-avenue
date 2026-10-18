@@ -151,7 +151,8 @@ export function HandbookPanel({ state, onClose }: { state: GameState; onClose: (
         <p><b>ACCOUNTS AND PITCHES</b></p>
         <p>Small companies send trial briefs. Make them happy and they sign a yearly contract, which also opens their sector.</p>
         <p>Clients on contract pay a monthly billing and expect a number of campaigns a year. Start those from the Accounts screen. At the anniversary they look back: good work raises billing, missed or weak campaigns lose the account.</p>
-        <p>Medium and large clients in your sectors invite you to pitch. The pitch is the Strategy stage of a normal campaign; beat the rival agencies and the campaign carries on as their first job.</p>
+        <p>Medium and large clients in your sectors invite you to pitch, but only once the agency is big enough: a Regional Shop for medium clients, a Madison Avenue Agency for large ones. The Accounts screen shows what the next step needs. The pitch is the Strategy stage of a normal campaign; beat the rival agencies and the campaign carries on as their first job.</p>
+        <p>An agency can't serve two rivals. Pitch for a competitor of a client and that client may hear about it and leave; win, and you have to drop them.</p>
         <p>Budget is always visible. Loyalty and Pickiness show once you've worked with a client.</p>
       </div>
       <h3>Discovered matches</h3>
