@@ -1,6 +1,7 @@
 import campaign from "../content/campaign.json";
 import clients from "../content/clients.json";
 import events from "../content/events.json";
+import logos from "../content/logos.json";
 
 export type AreaId =
   | "research" | "positioning" | "bigIdea"
@@ -156,3 +157,6 @@ export interface AgencyTier {
   renewedMedium?: boolean;
 }
 export const AGENCY_TIERS = clients.agencyTiers as AgencyTier[];
+
+/** Client logos as SVG markup, built by scripts/logos.mjs. */
+export const LOGOS = logos as Record<string, string>;

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AGENCY_TIERS, CATEGORIES, CLIENTS, eventDef, nameOf } from "../sim/content";
+import { AGENCY_TIERS, CATEGORIES, CLIENTS, LOGOS, eventDef, nameOf } from "../sim/content";
 import { dateOf, formatDate } from "../sim/calendar";
 import { SIZE_TIER, accountOf, agencyTier, canRequestCampaign, conflicts, renewThreshold, tierChecks, yearScore } from "../sim/accounts";
 import { eventText } from "../sim/events";
@@ -10,6 +10,12 @@ import { Modal, Stars } from "./common";
 import { money, store } from "./store";
 
 const SIZE_NAME = { small: "Small", medium: "Medium", large: "Large" };
+
+export function Logo({ name, hidden }: { name: string; hidden?: boolean }) {
+  const svg = LOGOS[name];
+  if (!svg || hidden) return <div className="logo blank" />;
+  return <div className="logo" dangerouslySetInnerHTML={{ __html: svg }} />;
+}
 
 export function AccountsPanel({ state, onClose }: { state: GameState; onClose: () => void }) {
   const [selected, setSelected] = useState<Brief | null>(null);
@@ -49,37 +55,40 @@ export function AccountsPanel({ state, onClose }: { state: GameState; onClose: (
                 const blocked = acc ? canRequestCampaign(state, c.name) : null;
                 return (
                   <div key={c.name} className={`company${acc ? " client" : ""}`}>
-                    <div className="spread">
-                      <b>{notYet ? "???" : c.name}</b>
-                      <span className="small muted">{SIZE_NAME[c.size]}</span>
-                    </div>
-                    {!notYet && (
-                      <div className="small stars-row">
-                        <span title="Budget">B <Stars n={c.budget} /></span>
-                        <span title="Loyalty">L <Stars n={c.loyalty} hidden={!known} /></span>
-                        <span title="Pickiness">P <Stars n={c.pickiness} hidden={!known} /></span>
+                    <Logo name={c.name} hidden={!!notYet} />
+                    <div className="info">
+                      <div className="spread">
+                        <b>{notYet ? "???" : c.name}</b>
+                        <span className="small muted">{SIZE_NAME[c.size]}</span>
                       </div>
-                    )}
-                    {acc ? (
-                      <div className="small stack-tight">
-                        <div>{money(acc.billing)}/yr · campaigns {acc.done}/{acc.expected + acc.free}</div>
-                        <div className="muted">
-                          Renews {formatDate(acc.renewDay)} · score {acc.sats.length ? yearScore(acc).toFixed(1) : "-"}, needs {renewThreshold(acc).toFixed(1)}
+                      {!notYet && (
+                        <div className="small stars-row">
+                          <span title="Budget">B <Stars n={c.budget} /></span>
+                          <span title="Loyalty">L <Stars n={c.loyalty} hidden={!known} /></span>
+                          <span title="Pickiness">P <Stars n={c.pickiness} hidden={!known} /></span>
                         </div>
-                        {waiting ? (
-                          <button className="primary small-btn" onClick={() => setSelected(waiting)}>Open their brief</button>
-                        ) : (
-                          <button className="primary small-btn" disabled={!!blocked || !!state.project} title={blocked ?? (state.project ? "The team is busy." : undefined)}
-                            onClick={() => open(store.act((s) => requestCampaign(s, c.name)))}>
-                            New campaign
-                          </button>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="small muted">
-                        {notYet ? `Founded later` : banned ? "We don't work for tobacco." : state.lostClients.includes(c.name) ? "Former client" : c.size === "small" ? "Sends trial briefs" : tier < SIZE_TIER[c.size] ? `Pitch only, for a ${AGENCY_TIERS[SIZE_TIER[c.size]].name}` : "Pitch only"}
-                      </div>
-                    )}
+                      )}
+                      {acc ? (
+                        <div className="small stack-tight">
+                          <div>{money(acc.billing)}/yr · campaigns {acc.done}/{acc.expected + acc.free}</div>
+                          <div className="muted">
+                            Renews {formatDate(acc.renewDay)} · score {acc.sats.length ? yearScore(acc).toFixed(1) : "-"}, needs {renewThreshold(acc).toFixed(1)}
+                          </div>
+                          {waiting ? (
+                            <button className="primary small-btn" onClick={() => setSelected(waiting)}>Open their brief</button>
+                          ) : (
+                            <button className="primary small-btn" disabled={!!blocked || !!state.project} title={blocked ?? (state.project ? "The team is busy." : undefined)}
+                              onClick={() => open(store.act((s) => requestCampaign(s, c.name)))}>
+                              New campaign
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="small muted">
+                          {notYet ? `Founded later` : banned ? "We don't work for tobacco." : state.lostClients.includes(c.name) ? "Former client" : c.size === "small" ? "Sends trial briefs" : tier < SIZE_TIER[c.size] ? `Pitch only, for a ${AGENCY_TIERS[SIZE_TIER[c.size]].name}` : "Pitch only"}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               })}
@@ -124,10 +133,13 @@ function RfpCard({ state, rfp, onPitch }: { state: GameState; rfp: Rfp; onPitch:
   return (
     <div className="card rfp stack">
       <div className="spread">
-        <div>
-          <span className="tag rfp">Invitation to pitch</span>
-          <h3>{c.name}</h3>
-          <div className="small muted">{nameOf(c.category)} · {SIZE_NAME[c.size]} · answer by {formatDate(rfp.expiresDay)}</div>
+        <div className="row">
+          <Logo name={c.name} />
+          <div>
+            <span className="tag rfp">Invitation to pitch</span>
+            <h3>{c.name}</h3>
+            <div className="small muted">{nameOf(c.category)} · {SIZE_NAME[c.size]} · answer by {formatDate(rfp.expiresDay)}</div>
+          </div>
         </div>
         <div className="small">
           <div>Budget <Stars n={c.budget} /></div>
